@@ -1,4 +1,11 @@
+*.egg-info
 *.log
+*.pyc
 *.swp
 *~
 .DS_Store
+/build
+/dist
+/vendor
+/.cache
+/.tox

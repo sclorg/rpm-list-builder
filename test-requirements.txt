@@ -1,0 +1,10 @@
+# Test
+pytest
+mock
+# Code Analysis
+flake8
+flake8-colors
+# flake8-import-order
+# flake8-pep257
+# Code Formatter
+pyformat
