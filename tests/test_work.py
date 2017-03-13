@@ -1,0 +1,71 @@
+import os
+import re
+import shutil
+from unittest.mock import MagicMock
+from unittest.mock import PropertyMock
+
+from rhsclbuilder.work import Work
+
+import helper
+
+
+def test_init():
+    work = None
+    mock_recipe = MagicMock()
+    mock_recipe.num_of_package.return_value = 2
+    try:
+        work = Work(mock_recipe)
+        assert work
+    finally:
+        working_dir = work.working_dir
+        assert working_dir
+        assert re.findall(r'/tmp/', working_dir)
+        if os.path.isdir(working_dir):
+            shutil.rmtree(working_dir)
+
+
+def test_close():
+    mock_recipe = MagicMock()
+    type(mock_recipe).num_of_package = PropertyMock(return_value=2)
+    work = Work(mock_recipe)
+    assert work
+    work.close()
+    assert not os.path.isdir(work.working_dir)
+
+
+def test_num_dir_name_from_count():
+    work = None
+    try:
+        mock_recipe = MagicMock()
+        type(mock_recipe).num_of_package = PropertyMock(return_value=11)
+        work = Work(mock_recipe)
+        assert work
+        assert work.num_dir_name_from_count(2) == '02'
+        assert work.num_dir_name_from_count(10) == '10'
+    finally:
+        work.close()
+
+
+def each_num_dir():
+    work = None
+
+    try:
+        mock_recipe = MagicMock()
+        type(mock_recipe).num_of_package = PropertyMock(return_value=2)
+        package_dicts = [
+            {'name': 'a'},
+            {'name': 'b'},
+        ]
+        mock_recipe.each_normalized_package.return_value = iter(package_dicts)
+
+        work = Work(mock_recipe)
+        assert work
+
+        for package_dict in work.each_num_dir():
+            assert re.match(os.getcwd(), '/[12]$')
+
+        with helper.pushd(work.working_dir):
+            assert os.path.isdir('1/a')
+            assert os.path.isdir('2/b')
+    finally:
+        work.close()

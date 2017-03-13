@@ -2,6 +2,7 @@ import pytest
 
 from rhsclbuilder.recipe import Recipe
 
+
 @pytest.fixture
 def ok_recipe():
     return Recipe('tests/fixtures/recipes/ror.yml', 'rh-ror50')

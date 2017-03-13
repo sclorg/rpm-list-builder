@@ -25,8 +25,6 @@ class Recipe(object):
             scl_dict = yaml.load(stream, Loader=Loader)
             self._scl = scl_dict[scl_id]
         self._num_of_package = len(self._scl['packages'])
-        max_digit = len(str(self._num_of_package))
-        self._num_dir_format = '%0{0}d'.format(str(max_digit))
 
     def dump(self):
         try:
@@ -41,12 +39,9 @@ class Recipe(object):
     def scl(self):
         return self._scl
 
+    @property
     def num_of_package(self):
         return self._num_of_package
-
-    def num_dir_name(self, count):
-        num_dir_name = self._num_dir_format % count
-        return num_dir_name
 
     def each_normalized_package(self):
         packages = self._scl['packages']

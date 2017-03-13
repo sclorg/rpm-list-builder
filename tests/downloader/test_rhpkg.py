@@ -1,9 +1,9 @@
-import pytest
+# import os
+# import subprocess
 from unittest.mock import MagicMock
 
 from rhsclbuilder.downloader.rhpkg import RhpkgDownloader
-from rhsclbuilder.recipe import Recipe
-import helper
+# import helper
 
 
 def test_init():
@@ -11,20 +11,28 @@ def test_init():
     assert downloader
 
 
-def test_download_branch():
+def test_download():
     downloader = RhpkgDownloader()
-    recipe = Recipe('tests/fixtures/recipes/ror.yml', 'rh-ror50')
     downloader.do_rhpkg_and_checkout = MagicMock(return_value=True)
-    for working_dir in helper.create_working_directory():
-        downloader.downloaded_directory = working_dir
-        downloader.run(recipe, branch='rhscl-foo')
+    package_dict = {'name': 'a'}
+    branch = 'private-foo'
+    downloader.download(package_dict, branch=branch)
+    assert True
 
 
-def test_download_no_branch():
+""" Comment out for the kerberos auth.
+def test_do_rhpkg_and_checkout():
     downloader = RhpkgDownloader()
-    recipe = Recipe('tests/fixtures/recipes/ror.yml', 'rh-ror50')
-    downloader.do_rhpkg_and_checkout = MagicMock(return_value=True)
-    for working_dir in helper.create_working_directory():
-        downloader.downloaded_directory = working_dir
-        with pytest.raises(ValueError):
-            downloader.run(recipe)
+    package_dict = {'name': 'rubygem-arel'}
+    branch = 'rhscl-2.4-rh-ror50-rhel-7'
+    with helper.pushd_tmp_dir():
+        # TODO: Add check for kerberos auth.
+        downloader.do_rhpkg_and_checkout(package_dict, branch)
+        spec_file = os.path.join('1', 'rubygem-arel', 'rubygem-arel.spec')
+        assert os.path.isfile(spec_file)
+        # Show current branch
+        # git rev-parse --abbrev-ref HEAD
+        # TODO Add assert for output of below command.
+        subprocess.check_call(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+        assert True
+"""

@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import os
 import shutil
 import tempfile
@@ -8,11 +9,23 @@ def touch(path):
         os.utime(path, None)
 
 
-def create_working_directory():
-    working_dir = None
+@contextmanager
+def pushd(new_dir):
+    previous_dir = os.getcwd()
     try:
-        working_dir = tempfile.mkdtemp(prefix='rhscl-builder-test-')
-        yield working_dir
+        os.chdir(new_dir)
+        yield
     finally:
-        if os.path.isdir(working_dir):
-            shutil.rmtree(working_dir)
+        os.chdir(previous_dir)
+
+
+@contextmanager
+def pushd_tmp_dir():
+    tmp_dir = None
+    try:
+        tmp_dir = tempfile.mkdtemp(prefix='rhscl-builder-tmp-')
+        with pushd(tmp_dir):
+            yield
+    finally:
+        if os.path.isdir(tmp_dir):
+            shutil.rmtree(tmp_dir)

@@ -1,9 +1,7 @@
 import os
-import shutil
 import tempfile
 
 from rhsclbuilder.downloader.local import LocalDownloader
-from rhsclbuilder.recipe import Recipe
 import helper
 
 
@@ -14,23 +12,14 @@ def test_init():
 
 def test_download():
     downloader = LocalDownloader()
-    # Create test data
-    previous_dir = os.getcwd()
+    package_dict = {'name': 'a'}
+    # Create source files for test.
     src_dir = tempfile.mkdtemp(prefix='rhscl-builder-test-src-')
-    recipe = Recipe('tests/fixtures/recipes/ror.yml', 'rh-ror50')
-    try:
-        # Change directory
-        os.chdir(src_dir)
-        # Create test directory and file there
-        os.makedirs('rh-ror50')
-        os.makedirs('rubygem-arel')
-        helper.touch(os.path.join('rh-ror50', 'a.txt'))
-        helper.touch(os.path.join('rubygem-arel', 'b.txt'))
+    with helper.pushd(src_dir):
+        os.makedirs('a')
+        helper.touch(os.path.join('a', 'a.spec'))
 
-        for working_dir in helper.create_working_directory():
-            downloader.downloaded_directory = working_dir
-            downloader.run(recipe, source_directory=src_dir)
-    finally:
-        os.chdir(previous_dir)
-        if src_dir:
-            shutil.rmtree(src_dir)
+    with helper.pushd_tmp_dir():
+        downloader.download(package_dict, source_directory=src_dir)
+        spec_file = os.path.join('a', 'a.spec')
+        assert os.path.isfile(spec_file)

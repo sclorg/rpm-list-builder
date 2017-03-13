@@ -6,6 +6,8 @@
 .DS_Store
 /build
 /dist
+/installed_files.txt
 /vendor
 /.cache
+/.eggs
 /.tox

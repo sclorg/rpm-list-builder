@@ -8,9 +8,13 @@ def test_camelize():
     assert new_word == 'FooBar'
 
 
-def test_import_class():
-    module = utils.import_class('rhsclbuilder.recipe.Recipe')
-    assert module
+def test_get_class():
+    cls = utils.get_class('rhsclbuilder.recipe.Recipe')
+    assert cls
+    cls = utils.get_class(
+        'rhsclbuilder.downloader.local.LocalDownloader'
+    )
+    assert cls
 
 
 def test_pushd():
