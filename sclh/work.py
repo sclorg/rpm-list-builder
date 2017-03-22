@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from rhsclbuilder import utils
+from sclh import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 class Work(object):
     """A class to manage working directory."""
 
-    def __init__(self, recipe):
+    def __init__(self, recipe, **kwargs):
         if recipe is None:
             raise ValueError('recipe is required.')
 
@@ -19,8 +19,15 @@ class Work(object):
         max_digit = len(str(recipe.num_of_package))
         self._num_dir_format = '%0{0}d'.format(str(max_digit))
 
-        self._working_dir = tempfile.mkdtemp(prefix='rhscl-builder-')
-        LOG.info('Working directory: %s', self._working_dir)
+        working_dir = None
+        if 'work_directory' in kwargs and kwargs['work_directory']:
+            working_dir = kwargs['work_directory']
+            if not os.path.exists(working_dir):
+                os.makedirs(working_dir)
+        else:
+            working_dir = tempfile.mkdtemp(prefix='rhscl-builder-')
+        LOG.info('Working directory: %s', working_dir)
+        self._working_dir = working_dir
 
     @property
     def working_dir(self):

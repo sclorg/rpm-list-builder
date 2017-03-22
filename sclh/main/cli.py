@@ -1,4 +1,4 @@
-from rhsclbuilder.application import Application
+from sclh.application import Application
 
 
 def main(argv=None):

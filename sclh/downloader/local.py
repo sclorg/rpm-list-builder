@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 
-from rhsclbuilder.downloader.base import BaseDownloader
+from sclh.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 
@@ -25,4 +25,5 @@ class LocalDownloader(BaseDownloader):
         LOG.debug('Copying %s to %s .', src_package_dir, dst_package_dir)
         # Set symlinks as True to Avoid to create new files from simbolic link.
         # Because it might be cost.
+        # TODO: Skip symbolic file when copying. The file is risky.
         shutil.copytree(src_package_dir, dst_package_dir, symlinks=True)

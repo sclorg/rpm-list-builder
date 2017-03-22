@@ -6,6 +6,10 @@ import subprocess
 LOG = logging.getLogger(__name__)
 
 
+def p(text):
+    print(repr(text))
+
+
 def camelize(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
@@ -34,22 +38,26 @@ def pushd(new_dir):
         os.chdir(previous_dir)
 
 
+def run_cmd_with_capture(cmd, **kwargs):
+    kwargs['stdout'] = subprocess.PIPE
+    kwargs['stderr'] = subprocess.PIPE
+    return run_cmd(cmd, **kwargs)
+
+
 def run_cmd(cmd, **kwargs):
     try:
         LOG.debug('CMD: %s', cmd)
-        # args = cmd.split()
-        check = kwargs['check'] if 'check' in kwargs else True
+        if 'check' not in kwargs:
+            kwargs['check'] = True
         # Use shell option to use wildcard "*".
-        result = subprocess.run(
-            cmd,
-            check=check,
-            shell=True,
-            stderr=subprocess.STDOUT
-        )
+        kwargs['shell'] = True
+
+        result = subprocess.run(cmd, **kwargs)
+        p(result)
         return result
     except subprocess.CalledProcessError as e:
-        LOG.error(e.cmd)
-        LOG.error(e.message)
-        LOG.error(e.returncode)
-        LOG.error(e.output)
+        LOG.error('CMD: %s', e.cmd)
+        LOG.error('Return Code: %s', e.returncode)
+        LOG.error('Stdout: %s', e.stdout.decode('utf-8').split('\n'))
+        LOG.error('Stderr: %s', e.stderr.decode('utf-8').split('\n'))
         raise e

@@ -2,11 +2,11 @@ import argparse
 import logging
 import os
 
-import rhsclbuilder
-from rhsclbuilder.recipe import Recipe
-from rhsclbuilder.builder.base import BaseBuilder
-from rhsclbuilder.downloader.base import BaseDownloader
-from rhsclbuilder.work import Work
+import sclh
+from sclh.recipe import Recipe
+from sclh.builder.base import BaseBuilder
+from sclh.downloader.base import BaseDownloader
+from sclh.work import Work
 
 LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
@@ -17,7 +17,7 @@ class Application(object):
 
     def __init__(self):
         self._program = 'rhscl-builder'
-        self._version = rhsclbuilder.__version__
+        self._version = sclh.__version__
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)
@@ -40,7 +40,9 @@ class Application(object):
 
             # Load recipe
             recipe = Recipe(args.recipe_file, args.scl_id)
-            work = Work(recipe)
+
+            args_dict = vars(args)
+            work = Work(recipe, **args_dict)
             # Load downloader
             downloader = BaseDownloader.get_instance(args.downloader)
             # Load builder
@@ -48,18 +50,11 @@ class Application(object):
 
             # Run downloader
             LOG.info('Downloading...')
-            downloader.run(
-                work,
-                source_directory=args.source_directory,
-                branch=args.branch
-            )
+            downloader.run(work, **args_dict)
 
             # Run builder
             LOG.info('Building...')
-            builder.run(
-                work,
-                copr_repo=args.copr_repo
-            )
+            builder.run(work, **args_dict)
             LOG.info('Done successfully.')
         except Exception as e:
             # work.close
@@ -81,16 +76,26 @@ class Application(object):
             'scl_id',
             help='ID in a recipe file. such as "python33", "rh-ror50"'
         )
-        parser.add_argument(
-            '-B', '--builder',
-            default='copr',
-            help='Set builder. The value is copr. Default: copr'
-        )
+        # General options
         parser.add_argument(
             '-D', '--downloader',
             default='local',
-            help='Set downloader. The values are local, rhpkg. Default: local',
+            help='Set downloader. Value: {local, rhpkg, none}. Default: local',
         )
+        help_message = 'Set builder. Value: {mock, copr, dummy, custom}. ' + \
+            'Default: dummy'
+        parser.add_argument(
+            '-B', '--builder',
+            default='dummy',
+            help=help_message,
+        )
+        help_message = 'Change work-directory to DIR. ' + \
+            'Default is using creatd tmp directory.'
+        parser.add_argument(
+            '-C', '--work-directory',
+            help=help_message,
+        )
+        # Downloader options
         parser.add_argument(
             '-b', '--branch',
             help='Git branch used in SCL package if downloader is rhpkg.',
@@ -103,9 +108,18 @@ class Application(object):
             default=current_dir,
             help=help_message,
         )
+        # Builder options
         parser.add_argument(
-            '-C', '--copr-repo',
+            '-M', '--mock-config',
+            help='Mock config used if builder is mock',
+        )
+        parser.add_argument(
+            '-c', '--copr-repo',
             help='Copr repo used if builder is copr',
+        )
+        parser.add_argument(
+            '--custom-file',
+            help='Custome script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
         return parsed_args

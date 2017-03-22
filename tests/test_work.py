@@ -1,10 +1,11 @@
 import os
 import re
 import shutil
+import tempfile
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 
-from rhsclbuilder.work import Work
+from sclh.work import Work
 
 import helper
 
@@ -20,6 +21,23 @@ def test_init():
         working_dir = work.working_dir
         assert working_dir
         assert re.findall(r'/tmp/', working_dir)
+        if os.path.isdir(working_dir):
+            shutil.rmtree(working_dir)
+
+
+def test_init_work_directory():
+    work = None
+    arg_working_dir = None
+    mock_recipe = MagicMock()
+    mock_recipe.num_of_package.return_value = 2
+    try:
+        arg_working_dir = tempfile.mkdtemp(prefix='rhscl-builder-test-')
+        work = Work(mock_recipe, work_directory=arg_working_dir)
+        assert work
+    finally:
+        working_dir = work.working_dir
+        assert working_dir
+        assert working_dir == arg_working_dir
         if os.path.isdir(working_dir):
             shutil.rmtree(working_dir)
 

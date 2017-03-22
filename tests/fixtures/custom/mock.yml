@@ -1,0 +1,6 @@
+before_script:
+  - mock -r rhscl-2.4-rh-ror50-rhel-7-x86-64 --scrub=all
+script:
+  - "rm -v *.rpm || true"
+  - rhpkg srpm
+  - "mock -r rhscl-2.4-rh-ror50-rhel-7-x86-64 -n *.rpm"

@@ -1,6 +1,6 @@
 import os
 
-from rhsclbuilder.application import Application
+from sclh.application import Application
 
 
 def test_init():
@@ -14,7 +14,7 @@ def test_parse_argv_no_options():
     assert args
     assert args.recipe_file == '/tmp/ror.yml'
     assert args.scl_id == 'rh-ror50'
-    assert args.builder == 'copr'
+    assert args.builder == 'dummy'
     assert args.downloader == 'local'
     assert args.branch is None
     current_dir = os.getcwd()

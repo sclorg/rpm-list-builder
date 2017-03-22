@@ -1,0 +1,4 @@
+script:
+  - pwd
+  - echo aaa
+  - echo bbb && echo ccc

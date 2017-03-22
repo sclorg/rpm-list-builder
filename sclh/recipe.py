@@ -1,5 +1,6 @@
 import logging
-import yaml
+
+from sclh.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
 
@@ -16,24 +17,10 @@ class Recipe(object):
         self._scl_id = scl_id
         self._scl = None
 
-        try:
-            from yaml import CLoader as Loader
-        except ImportError:
-            from yaml import Loader
-
-        with open(file_path, 'r') as stream:
-            scl_dict = yaml.load(stream, Loader=Loader)
-            self._scl = scl_dict[scl_id]
+        yaml = Yaml(file_path)
+        scl_dict = yaml.content
+        self._scl = scl_dict[scl_id]
         self._num_of_package = len(self._scl['packages'])
-
-    def dump(self):
-        try:
-            from yaml import CDumper as Dumper
-        except ImportError:
-            from yaml import Dumper
-        output = yaml.dump(self._scl, Dumper=Dumper,
-                           default_flow_style=False)
-        print(output)
 
     @property
     def scl(self):

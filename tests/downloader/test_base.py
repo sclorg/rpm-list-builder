@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from rhsclbuilder.downloader.base import BaseDownloader
+from sclh.downloader.base import BaseDownloader
 
 
 def test_init():

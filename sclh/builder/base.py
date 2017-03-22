@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-# from rhsclbuilder import utils
+# from sclh import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -16,23 +16,40 @@ class BaseBuilder(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'rhsclbuilder.builder.{0}.{1}Builder'.format(
+        # class_name = 'sclh.builder.{0}.{1}Builder'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
-        if name == 'copr':
-            from rhsclbuilder.builder.copr import CoprBuilder
+        if name == 'mock':
+            from sclh.builder.mock import MockBuilder
+            instance = MockBuilder()
+        elif name == 'copr':
+            from sclh.builder.copr import CoprBuilder
             instance = CoprBuilder()
+        elif name == 'custom':
+            from sclh.builder.custom import CustomBuilder
+            instance = CustomBuilder()
+        elif name == 'dummy':
+            from sclh.builder.dummy import DummyBuilder
+            instance = DummyBuilder()
         else:
             raise ValueError('name is invalid.')
         return instance
 
     def run(self, work, **kwargs):
+        self.before_run(work, **kwargs)
         for package_dict in work.each_package_dir():
             self.prepare(package_dict)
             self.build(package_dict, **kwargs)
+        self.after_run(work, **kwargs)
+
+    def before_run(self, work, **kwargs):
+        pass
+
+    def after_run(self, work, **kwargs):
+        pass
 
     def prepare(self, package_dict):
         if 'name' not in package_dict:
@@ -63,7 +80,6 @@ class BaseBuilder(object):
             if fh_r:
                 fh_r.close()
 
-    # TODO: for both macros and replaced_macros
     def edit_spec_file_by_macros(self, spec_file, macros_dict):
         if not isinstance(macros_dict, dict):
             return ValueError('macros should be dict object.')

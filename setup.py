@@ -1,36 +1,29 @@
 import setuptools
 
-import rhsclbuilder
-
-requires = [
-    # 'PyYAML',
-]
-tests_require = [
-    'pytest',
-    'mock',
-]
+import sclh
 
 setuptools.setup(
-    name='rhsclbuilder',
+    name='sclh',
     license='GPLv2+',
-    version=rhsclbuilder.__version__,
+    version=sclh.__version__,
     description='Package builder for Red Hat Software Collection.',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
     url='https://gitlab.cee.redhat.com/jaruga/rhscl-builder',
     packages=[
-        'rhsclbuilder',
-        'rhsclbuilder.builder',
-        'rhsclbuilder.downloader',
-        'rhsclbuilder.main',
+        'sclh',
+        'sclh.builder',
+        'sclh.downloader',
+        'sclh.main',
     ],
-    install_requires=requires,
+    install_requires=[
+        'PyYAML'
+    ],
     entry_points={
         'console_scripts': [
-            'rhscl-builder=rhsclbuilder.main.cli:main',
+            'rhscl-builder=sclh.main.cli:main',
         ]
     },
-    tests_require=tests_require,
     setup_requires=[
         'pytest-runner',
     ],
