@@ -53,14 +53,14 @@ class Work(object):
             if not os.path.isdir(num_dir):
                 os.makedirs(num_dir)
             with utils.pushd(num_dir):
-                yield package_dict
+                yield package_dict, num_dir_name
 
             count += 1
         return True
 
     def each_package_dir(self):
-        for package_dict in self.each_num_dir():
+        for package_dict, num_dir_name in self.each_num_dir():
             package = package_dict['name']
             with utils.pushd(package):
-                yield package_dict
+                yield package_dict, num_dir_name
         return True

@@ -110,6 +110,11 @@ class Application(object):
         )
         # Builder options
         parser.add_argument(
+            '-r', '--resume',
+            type=int,
+            help='Resume to build from the pacakge number',
+        )
+        parser.add_argument(
             '-M', '--mock-config',
             help='Mock config used if builder is mock',
         )

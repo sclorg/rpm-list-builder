@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from retrying import retry
 
 # from rhsclbuilder import utils
 
@@ -40,9 +41,21 @@ class BaseBuilder(object):
 
     def run(self, work, **kwargs):
         self.before_run(work, **kwargs)
-        for package_dict in work.each_package_dir():
+
+        is_resume = 'resume' in kwargs and kwargs['resume']
+        resume_num = 0
+        if is_resume:
+            resume_num = kwargs['resume']
+
+        for package_dict, num_dir_name in work.each_package_dir():
+            if is_resume:
+                num = int(num_dir_name)
+                if num < resume_num:
+                    continue
+
             self.prepare(package_dict)
             self.build(package_dict, **kwargs)
+
         self.after_run(work, **kwargs)
 
     def before_run(self, work, **kwargs):
@@ -61,6 +74,7 @@ class BaseBuilder(object):
             self.edit_spec_file_by_replaced_macros(
                 spec_file, package_dict['replaced_macros'])
 
+    @retry(stop_max_attempt_number=3)
     def build(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')
 

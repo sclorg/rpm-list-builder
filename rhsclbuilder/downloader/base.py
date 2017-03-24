@@ -34,7 +34,7 @@ class BaseDownloader(object):
         return instance
 
     def run(self, work, **kwargs):
-        for package_dict in work.each_num_dir():
+        for package_dict, num_dir_name in work.each_num_dir():
             # TODO(Run it with asynchronous)
             self.download(package_dict, **kwargs)
         return True

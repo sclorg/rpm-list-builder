@@ -118,6 +118,17 @@ only_build_by_custom_echo_test() {
         rh-ror50
 }
 
+only_build_by_custom_echo_resume_test() {
+    "${SCL_BUILDER}" \
+        -D none \
+        -B custom \
+        -C "${WORK_DIR}" \
+        -r 3 \
+        --custom-file "${CUSTOM_DIR}/echo.yml" \
+        "${RECEIPE_TEST_FILE}" \
+        rh-ror50
+}
+
 only_build_by_custom_mock_test() {
     "${SCL_BUILDER}" \
         -D none \
@@ -136,4 +147,5 @@ only_download_test
 only_build_test
 only_build_by_mock_test
 only_build_by_custom_echo_test
+only_build_by_custom_echo_resume_test
 only_build_by_custom_mock_test

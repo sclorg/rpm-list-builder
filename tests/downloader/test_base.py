@@ -16,6 +16,11 @@ def test_run():
         {'name': 'a'},
         {'name': 'b'},
     ]
-    mock_work.each_num_dir.return_value = iter(package_dicts)
+    num_dir_names = [
+        '1',
+        '2',
+    ]
+    mock_work.each_num_dir.return_value = iter(
+        zip(package_dicts, num_dir_names))
     result = downloader.run(mock_work)
     assert result

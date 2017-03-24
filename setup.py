@@ -17,7 +17,8 @@ setuptools.setup(
         'rhsclbuilder.main',
     ],
     install_requires=[
-        'PyYAML'
+        'PyYAML',
+        'retrying',
     ],
     entry_points={
         'console_scripts': [

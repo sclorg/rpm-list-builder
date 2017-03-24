@@ -64,7 +64,7 @@ def test_num_dir_name_from_count():
         work.close()
 
 
-def each_num_dir():
+def test_each_num_dir():
     work = None
 
     try:
@@ -79,11 +79,14 @@ def each_num_dir():
         work = Work(mock_recipe)
         assert work
 
-        for package_dict in work.each_num_dir():
-            assert re.match(os.getcwd(), '/[12]$')
+        for package_dict, num_dir_name in work.each_num_dir():
+            assert package_dict
+            assert num_dir_name
+            assert re.match('^[12]$', num_dir_name)
+            assert re.match('^.+/[12]$', os.getcwd())
 
         with helper.pushd(work.working_dir):
-            assert os.path.isdir('1/a')
-            assert os.path.isdir('2/b')
+            assert os.path.isdir('1')
+            assert os.path.isdir('2')
     finally:
         work.close()

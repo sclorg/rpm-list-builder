@@ -23,7 +23,19 @@ class LocalDownloader(BaseDownloader):
         src_package_dir = os.path.join(src_dir, package)
         dst_package_dir = os.path.join(os.getcwd(), package)
         LOG.debug('Copying %s to %s .', src_package_dir, dst_package_dir)
-        # Set symlinks as True to Avoid to create new files from simbolic link.
-        # Because it might be cost.
-        # TODO: Skip symbolic file when copying. The file is risky.
-        shutil.copytree(src_package_dir, dst_package_dir, symlinks=True)
+
+        def ignore_symlinks(directory, files):
+            ignored_files = []
+            for f in files:
+                full_path = os.path.join(directory, f)
+                if os.path.islink(full_path):
+                    ignored_files.append(f)
+            return ignored_files
+
+        # Skip symbolic file when copying because the file is risky.
+        shutil.copytree(
+            src_package_dir,
+            dst_package_dir,
+            ignore=ignore_symlinks,
+            symlinks=True
+        )
