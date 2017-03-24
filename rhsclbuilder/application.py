@@ -2,11 +2,11 @@ import argparse
 import logging
 import os
 
-import sclh
-from sclh.recipe import Recipe
-from sclh.builder.base import BaseBuilder
-from sclh.downloader.base import BaseDownloader
-from sclh.work import Work
+import rhsclbuilder
+from rhsclbuilder.recipe import Recipe
+from rhsclbuilder.builder.base import BaseBuilder
+from rhsclbuilder.downloader.base import BaseDownloader
+from rhsclbuilder.work import Work
 
 LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
@@ -17,7 +17,7 @@ class Application(object):
 
     def __init__(self):
         self._program = 'rhscl-builder'
-        self._version = sclh.__version__
+        self._version = rhsclbuilder.__version__
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)

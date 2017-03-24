@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from sclh import utils
+from rhsclbuilder import utils
 
 
 def test_camelize():
@@ -10,10 +10,10 @@ def test_camelize():
 
 
 def test_get_class():
-    cls = utils.get_class('sclh.recipe.Recipe')
+    cls = utils.get_class('rhsclbuilder.recipe.Recipe')
     assert cls
     cls = utils.get_class(
-        'sclh.downloader.local.LocalDownloader'
+        'rhsclbuilder.downloader.local.LocalDownloader'
     )
     assert cls
 

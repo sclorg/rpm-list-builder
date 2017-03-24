@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from sclh.downloader.local import LocalDownloader
+from rhsclbuilder.downloader.local import LocalDownloader
 import helper
 
 

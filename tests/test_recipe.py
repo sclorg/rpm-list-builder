@@ -1,6 +1,6 @@
 import pytest
 
-from sclh.recipe import Recipe
+from rhsclbuilder.recipe import Recipe
 
 
 @pytest.fixture

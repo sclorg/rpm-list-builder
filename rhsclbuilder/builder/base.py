@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-# from sclh import utils
+# from rhsclbuilder import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -16,23 +16,23 @@ class BaseBuilder(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'sclh.builder.{0}.{1}Builder'.format(
+        # class_name = 'rhsclbuilder.builder.{0}.{1}Builder'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'mock':
-            from sclh.builder.mock import MockBuilder
+            from rhsclbuilder.builder.mock import MockBuilder
             instance = MockBuilder()
         elif name == 'copr':
-            from sclh.builder.copr import CoprBuilder
+            from rhsclbuilder.builder.copr import CoprBuilder
             instance = CoprBuilder()
         elif name == 'custom':
-            from sclh.builder.custom import CustomBuilder
+            from rhsclbuilder.builder.custom import CustomBuilder
             instance = CustomBuilder()
         elif name == 'dummy':
-            from sclh.builder.dummy import DummyBuilder
+            from rhsclbuilder.builder.dummy import DummyBuilder
             instance = DummyBuilder()
         else:
             raise ValueError('name is invalid.')

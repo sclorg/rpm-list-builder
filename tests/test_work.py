@@ -5,7 +5,7 @@ import tempfile
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 
-from sclh.work import Work
+from rhsclbuilder.work import Work
 
 import helper
 

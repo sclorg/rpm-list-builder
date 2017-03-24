@@ -1,6 +1,6 @@
 import logging
 
-# from sclh import utils
+# from rhsclbuilder import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -14,20 +14,20 @@ class BaseDownloader(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'sclh.downloader.{0}.{1}Downloader'.format(
+        # class_name = 'rhsclbuilder.downloader.{0}.{1}Downloader'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'local':
-            from sclh.downloader.local import LocalDownloader
+            from rhsclbuilder.downloader.local import LocalDownloader
             instance = LocalDownloader()
         elif name == 'rhpkg':
-            from sclh.downloader.rhpkg import RhpkgDownloader
+            from rhsclbuilder.downloader.rhpkg import RhpkgDownloader
             instance = RhpkgDownloader()
         elif name == 'none':
-            from sclh.downloader.none import NoneDownloader
+            from rhsclbuilder.downloader.none import NoneDownloader
             instance = NoneDownloader()
         else:
             raise ValueError('name is invalid.')

@@ -59,7 +59,7 @@ sdist:
 
 bdist-rpm:
 	$(PYTHON) setup.py bdist --formats=rpm; \
-	rpm -qpl ./dist/sclh-*.noarch.rpm
+	rpm -qpl ./dist/rhsclbuilder-*.noarch.rpm
 .PHONY: bdist-rpm
 
 
@@ -78,6 +78,6 @@ sdist:
 
 bdist-rpm:
 	$(PYTHON) setup.py bdist --formats=rpm; \
-	rpm -qpl ./dist/sclh-*.noarch.rpm
+	rpm -qpl ./dist/rhsclbuilder-*.noarch.rpm
 .PHONY: bdist-rpm
 

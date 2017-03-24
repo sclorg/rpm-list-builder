@@ -1,6 +1,6 @@
 import os
 
-from sclh.application import Application
+from rhsclbuilder.application import Application
 
 
 def test_init():

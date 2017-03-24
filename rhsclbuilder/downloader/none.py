@@ -1,6 +1,6 @@
 import logging
 
-from sclh.downloader.base import BaseDownloader
+from rhsclbuilder.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 

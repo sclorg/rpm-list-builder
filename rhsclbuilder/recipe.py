@@ -1,6 +1,6 @@
 import logging
 
-from sclh.yaml import Yaml
+from rhsclbuilder.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
 

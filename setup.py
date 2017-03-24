@@ -1,27 +1,27 @@
 import setuptools
 
-import sclh
+import rhsclbuilder
 
 setuptools.setup(
-    name='sclh',
+    name='rhsclbuilder',
     license='GPLv2+',
-    version=sclh.__version__,
+    version=rhsclbuilder.__version__,
     description='Package builder for Red Hat Software Collection.',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
     url='https://gitlab.cee.redhat.com/jaruga/rhscl-builder',
     packages=[
-        'sclh',
-        'sclh.builder',
-        'sclh.downloader',
-        'sclh.main',
+        'rhsclbuilder',
+        'rhsclbuilder.builder',
+        'rhsclbuilder.downloader',
+        'rhsclbuilder.main',
     ],
     install_requires=[
         'PyYAML'
     ],
     entry_points={
         'console_scripts': [
-            'rhscl-builder=sclh.main.cli:main',
+            'rhscl-builder=rhsclbuilder.main.cli:main',
         ]
     },
     setup_requires=[

@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from sclh import utils
+from rhsclbuilder import utils
 
 LOG = logging.getLogger(__name__)
 
