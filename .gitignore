@@ -9,6 +9,7 @@
 /installed_files.txt
 /tmp
 /vendor
+/venv
 /.cache
 /.eggs
 /.tox

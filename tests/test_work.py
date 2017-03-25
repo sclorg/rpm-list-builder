@@ -5,7 +5,7 @@ import tempfile
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 
-from rhsclbuilder.work import Work
+from sclrbh.work import Work
 
 import helper
 
@@ -31,7 +31,7 @@ def test_init_work_directory():
     mock_recipe = MagicMock()
     mock_recipe.num_of_package.return_value = 2
     try:
-        arg_working_dir = tempfile.mkdtemp(prefix='rhscl-builder-test-')
+        arg_working_dir = tempfile.mkdtemp(prefix='sclrbh-test-')
         work = Work(mock_recipe, work_directory=arg_working_dir)
         assert work
     finally:
@@ -51,15 +51,15 @@ def test_close():
     assert not os.path.isdir(work.working_dir)
 
 
-def test_num_dir_name_from_count():
+def test_num_name_from_count():
     work = None
     try:
         mock_recipe = MagicMock()
         type(mock_recipe).num_of_package = PropertyMock(return_value=11)
         work = Work(mock_recipe)
         assert work
-        assert work.num_dir_name_from_count(2) == '02'
-        assert work.num_dir_name_from_count(10) == '10'
+        assert work.num_name_from_count(2) == '02'
+        assert work.num_name_from_count(10) == '10'
     finally:
         work.close()
 
@@ -79,10 +79,10 @@ def test_each_num_dir():
         work = Work(mock_recipe)
         assert work
 
-        for package_dict, num_dir_name in work.each_num_dir():
+        for package_dict, num_name in work.each_num_dir():
             assert package_dict
-            assert num_dir_name
-            assert re.match('^[12]$', num_dir_name)
+            assert num_name
+            assert re.match('^[12]$', num_name)
             assert re.match('^.+/[12]$', os.getcwd())
 
         with helper.pushd(work.working_dir):

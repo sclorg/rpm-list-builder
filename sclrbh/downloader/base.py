@@ -1,6 +1,6 @@
 import logging
 
-# from rhsclbuilder import utils
+# from sclrbh import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -14,27 +14,27 @@ class BaseDownloader(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'rhsclbuilder.downloader.{0}.{1}Downloader'.format(
+        # class_name = 'sclrbh.downloader.{0}.{1}Downloader'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'local':
-            from rhsclbuilder.downloader.local import LocalDownloader
+            from sclrbh.downloader.local import LocalDownloader
             instance = LocalDownloader()
         elif name == 'rhpkg':
-            from rhsclbuilder.downloader.rhpkg import RhpkgDownloader
+            from sclrbh.downloader.rhpkg import RhpkgDownloader
             instance = RhpkgDownloader()
         elif name == 'none':
-            from rhsclbuilder.downloader.none import NoneDownloader
+            from sclrbh.downloader.none import NoneDownloader
             instance = NoneDownloader()
         else:
             raise ValueError('name is invalid.')
         return instance
 
     def run(self, work, **kwargs):
-        for package_dict, num_dir_name in work.each_num_dir():
+        for package_dict, num_name in work.each_num_dir():
             # TODO(Run it with asynchronous)
             self.download(package_dict, **kwargs)
         return True

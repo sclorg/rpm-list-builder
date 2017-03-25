@@ -1,20 +1,19 @@
 import setuptools
 
-import rhsclbuilder
+import sclrbh
 
 setuptools.setup(
-    name='rhsclbuilder',
+    name='sclrbh',
     license='GPLv2+',
-    version=rhsclbuilder.__version__,
-    description='Package builder for Red Hat Software Collection.',
+    version=sclrbh.__version__,
+    description='Software Collection Rebuild Helper',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
     url='https://gitlab.cee.redhat.com/jaruga/rhscl-builder',
     packages=[
-        'rhsclbuilder',
-        'rhsclbuilder.builder',
-        'rhsclbuilder.downloader',
-        'rhsclbuilder.main',
+        'sclrbh',
+        'sclrbh.builder',
+        'sclrbh.downloader',
     ],
     install_requires=[
         'PyYAML',
@@ -22,7 +21,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'rhscl-builder=rhsclbuilder.main.cli:main',
+            'sclrbh=sclrbh.cli:main',
         ]
     },
     setup_requires=[

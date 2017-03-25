@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from rhsclbuilder.downloader.base import BaseDownloader
+from sclrbh.downloader.base import BaseDownloader
 
 
 def test_init():
@@ -16,11 +16,11 @@ def test_run():
         {'name': 'a'},
         {'name': 'b'},
     ]
-    num_dir_names = [
+    num_names = [
         '1',
         '2',
     ]
     mock_work.each_num_dir.return_value = iter(
-        zip(package_dicts, num_dir_names))
+        zip(package_dicts, num_names))
     result = downloader.run(mock_work)
     assert result

@@ -3,7 +3,7 @@ import os
 import re
 from retrying import retry
 
-# from rhsclbuilder import utils
+# from sclrbh import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -17,23 +17,23 @@ class BaseBuilder(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'rhsclbuilder.builder.{0}.{1}Builder'.format(
+        # class_name = 'sclrbh.builder.{0}.{1}Builder'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'mock':
-            from rhsclbuilder.builder.mock import MockBuilder
+            from sclrbh.builder.mock import MockBuilder
             instance = MockBuilder()
         elif name == 'copr':
-            from rhsclbuilder.builder.copr import CoprBuilder
+            from sclrbh.builder.copr import CoprBuilder
             instance = CoprBuilder()
         elif name == 'custom':
-            from rhsclbuilder.builder.custom import CustomBuilder
+            from sclrbh.builder.custom import CustomBuilder
             instance = CustomBuilder()
         elif name == 'dummy':
-            from rhsclbuilder.builder.dummy import DummyBuilder
+            from sclrbh.builder.dummy import DummyBuilder
             instance = DummyBuilder()
         else:
             raise ValueError('name is invalid.')
@@ -47,9 +47,9 @@ class BaseBuilder(object):
         if is_resume:
             resume_num = kwargs['resume']
 
-        for package_dict, num_dir_name in work.each_package_dir():
+        for package_dict, num_name in work.each_package_dir():
             if is_resume:
-                num = int(num_dir_name)
+                num = int(num_name)
                 if num < resume_num:
                     continue
 
@@ -86,7 +86,7 @@ class BaseBuilder(object):
         try:
             fh_r = open(spec_file_origin, 'r')
             fh_w = open(spec_file, 'w')
-            fh_w.write('# Edited by rhscl-builder\n')
+            fh_w.write('# Edited by sclrbh\n')
             yield(fh_r, fh_w)
         finally:
             if fh_w:
