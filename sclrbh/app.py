@@ -134,7 +134,7 @@ class Application(object):
         )
         parser.add_argument(
             '--custom-file',
-            help='Custome script file used if builder is custom',
+            help='Custom script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
         return parsed_args

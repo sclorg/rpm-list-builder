@@ -8,7 +8,7 @@ LOG = logging.getLogger(__name__)
 
 
 class CustomBuilder(BaseBuilder):
-    """A builder class for Copr."""
+    """A custom builder class."""
 
     def __init__(self):
         self._yaml_content = None

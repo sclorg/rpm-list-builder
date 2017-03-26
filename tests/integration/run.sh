@@ -72,9 +72,9 @@ prepare_work_dir() {
     mkdir "${WORK_DIR}"
 
     "${CLI}" \
-        -D local \
-        -s "${SOURCE_DIR}" \
-        -C "${WORK_DIR}" \
+        --download "local" \
+        --source-directory "${SOURCE_DIR}" \
+        --work-directory "${WORK_DIR}" \
         "${RECEIPE_TEST_MACRO_FILE}" \
         "${RECIPE_ID}"
     return "${?}"
@@ -85,9 +85,9 @@ download_only_test() {
 
     test_work_dir="$(make_test_dir)"
     "${CLI}" \
-        -D local \
-        -s "${SOURCE_DIR}" \
-        -C "${test_work_dir}" \
+        --download "local" \
+        --source-directory "${SOURCE_DIR}" \
+        --work-directory "${test_work_dir}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     local status="${?}"
@@ -100,10 +100,10 @@ download_from_local_and_build_with_dummy_test() {
 
     test_work_dir="$(make_test_dir)"
     "${CLI}" \
-        -D local \
-        -B dummy \
-        -s "${SOURCE_DIR}" \
-        -C "${test_work_dir}" \
+        --download "local" \
+        --build dummy \
+        --source-directory "${SOURCE_DIR}" \
+        --work-directory "${test_work_dir}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     local status="${?}"
@@ -113,9 +113,9 @@ download_from_local_and_build_with_dummy_test() {
 
 download_by_rhpkg_and_build_with_dummy_test() {
     "${CLI}" \
-        -D rhpkg \
-        -B dummy \
-        -b "${BRANCH}" \
+        --download rhpkg \
+        --build dummy \
+        --branch "${BRANCH}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     return "${?}"
@@ -125,7 +125,7 @@ build_only_test() {
     prepare_work_dir
 
     "${CLI}" \
-        -C "${WORK_DIR}" \
+        --work-directory "${WORK_DIR}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     return "${?}"
@@ -140,8 +140,8 @@ build_only_with_mock_test() {
     prepare_work_dir
 
     "${CLI}" \
-        -B mock \
-        -C "${WORK_DIR}" \
+        --build mock \
+        --work-directory "${WORK_DIR}" \
         -M "${MOCK_CONFIG}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
@@ -154,8 +154,8 @@ build_only_with_custom_echo_test() {
     prepare_work_dir
 
     "${CLI}" \
-        -B custom \
-        -C "${WORK_DIR}" \
+        --build custom \
+        --work-directory "${WORK_DIR}" \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
@@ -166,8 +166,8 @@ build_only_with_custom_mock_test() {
     prepare_work_dir
 
     "${CLI}" \
-        -B custom \
-        -C "${WORK_DIR}" \
+        --build custom \
+        --work-directory "${WORK_DIR}" \
         --custom-file "${CUSTOM_DIR}/mock.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
@@ -178,9 +178,9 @@ build_only_resume_test() {
     prepare_work_dir
 
     "${CLI}" \
-        -B custom \
-        -C "${WORK_DIR}" \
-        -r 3 \
+        --build custom \
+        --work-directory "${WORK_DIR}" \
+        --resume 3 \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MACRO_FILE}" \
         "${RECIPE_ID}"
