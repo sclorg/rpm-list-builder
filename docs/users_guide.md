@@ -134,19 +134,19 @@ work_directory/
 
 #### Copr build
 
-* Prepare copr repo to build.
+1. Prepare copr repo to build.
 
-* If you want to delete pacakages in the copr, enter
+2. If you want to delete pacakages in the copr, enter
 
-      $ scripts/delete_copr_pkgs COPR_REPO
+        $ scripts/delete_copr_pkgs COPR_REPO
 
-* If you want to build from pacakges in your local (= SOURCE_DIRECTORY), enter
+3. If you want to build from pacakges in your local (= SOURCE_DIRECTORY), enter
 
-      $ sclrbh \
-        -D local \
-        -s SOURCE_DIRECTORY \
-        -C COPR_REPO \
-        RECIPE_FILE \
-        RECIPE_ID
+        $ sclrbh \
+          -D local \
+          -s SOURCE_DIRECTORY \
+          -C COPR_REPO \
+          RECIPE_FILE \
+          RECIPE_ID
 
 #### Custom build
