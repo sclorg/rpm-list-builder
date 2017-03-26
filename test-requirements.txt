@@ -1,6 +1,6 @@
 # Test
 pytest
-mock
+mock # for Python2
 # Code Analysis
 flake8
 flake8-colors
@@ -8,3 +8,5 @@ flake8-colors
 # flake8-pep257
 # Code Formatter
 pyformat
+# Documentation
+# Sphinx

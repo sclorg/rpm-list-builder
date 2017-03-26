@@ -1,6 +1,6 @@
 import os
 
-from rhsclbuilder.application import Application
+from sclrbh.app import Application
 
 
 def test_init():
@@ -14,27 +14,27 @@ def test_parse_argv_no_options():
     assert args
     assert args.recipe_file == '/tmp/ror.yml'
     assert args.scl_id == 'rh-ror50'
-    assert args.builder == 'dummy'
-    assert args.downloader == 'local'
+    assert args.build == 'dummy'
+    assert args.download == 'none'
     assert args.branch is None
     current_dir = os.getcwd()
     assert args.source_directory == current_dir
 
 
-def test_parse_argv_builder():
+def test_parse_argv_build():
     app = Application()
     args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
                            '-B', 'mock'])
     assert args
-    assert args.builder == 'mock'
+    assert args.build == 'mock'
 
 
-def test_parse_argv_downloader():
+def test_parse_argv_download():
     app = Application()
     args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
                            '-D', 'rhpkg'])
     assert args
-    assert args.downloader == 'rhpkg'
+    assert args.download == 'rhpkg'
 
 
 def test_parse_branch():

@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from rhsclbuilder import utils
+from sclrbh import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Work(object):
             if not os.path.exists(working_dir):
                 os.makedirs(working_dir)
         else:
-            working_dir = tempfile.mkdtemp(prefix='rhscl-builder-')
+            working_dir = tempfile.mkdtemp(prefix='sclrbh-')
         LOG.info('Working directory: %s', working_dir)
         self._working_dir = working_dir
 
@@ -37,9 +37,9 @@ class Work(object):
         if os.path.isdir(self._working_dir):
             shutil.rmtree(self._working_dir)
 
-    def num_dir_name_from_count(self, count):
-        num_dir_name = self._num_dir_format % count
-        return num_dir_name
+    def num_name_from_count(self, count):
+        num_name = self._num_dir_format % count
+        return num_name
 
     def each_num_dir(self):
         if not os.path.isdir(self._working_dir):
@@ -47,20 +47,20 @@ class Work(object):
 
         count = 1
         for package_dict in self._recipe.each_normalized_package():
-            num_dir_name = self.num_dir_name_from_count(count)
-            num_dir = os.path.join(self._working_dir, num_dir_name)
+            num_name = self.num_name_from_count(count)
+            num_dir = os.path.join(self._working_dir, num_name)
 
             if not os.path.isdir(num_dir):
                 os.makedirs(num_dir)
             with utils.pushd(num_dir):
-                yield package_dict, num_dir_name
+                yield package_dict, num_name
 
             count += 1
         return True
 
     def each_package_dir(self):
-        for package_dict, num_dir_name in self.each_num_dir():
+        for package_dict, num_name in self.each_num_dir():
             package = package_dict['name']
             with utils.pushd(package):
-                yield package_dict, num_dir_name
+                yield package_dict, num_name
         return True

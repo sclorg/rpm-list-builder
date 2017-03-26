@@ -1,6 +1,6 @@
 import logging
 
-from rhsclbuilder.yaml import Yaml
+from sclrbh.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
 
@@ -9,9 +9,9 @@ class Recipe(object):
     """A class to describe recipe data."""
 
     def __init__(self, file_path, scl_id):
-        if file_path is None:
+        if not file_path:
             raise ValueError('file_path is required.')
-        if scl_id is None:
+        if not scl_id:
             raise ValueError('scl_id is required.')
 
         self._scl_id = scl_id

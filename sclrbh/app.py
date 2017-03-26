@@ -2,11 +2,11 @@ import argparse
 import logging
 import os
 
-import rhsclbuilder
-from rhsclbuilder.recipe import Recipe
-from rhsclbuilder.builder.base import BaseBuilder
-from rhsclbuilder.downloader.base import BaseDownloader
-from rhsclbuilder.work import Work
+import sclrbh
+from sclrbh.recipe import Recipe
+from sclrbh.builder.base import BaseBuilder
+from sclrbh.downloader.base import BaseDownloader
+from sclrbh.work import Work
 
 LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
@@ -16,8 +16,8 @@ class Application(object):
     """An application class."""
 
     def __init__(self):
-        self._program = 'rhscl-builder'
-        self._version = rhsclbuilder.__version__
+        self._program = 'sclrbh'
+        self._version = sclrbh.__version__
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)
@@ -44,9 +44,9 @@ class Application(object):
             args_dict = vars(args)
             work = Work(recipe, **args_dict)
             # Load downloader
-            downloader = BaseDownloader.get_instance(args.downloader)
+            downloader = BaseDownloader.get_instance(args.download)
             # Load builder
-            builder = BaseBuilder.get_instance(args.builder)
+            builder = BaseBuilder.get_instance(args.build)
 
             # Run downloader
             LOG.info('Downloading...')
@@ -77,20 +77,28 @@ class Application(object):
             help='ID in a recipe file. such as "python33", "rh-ror50"'
         )
         # General options
-        parser.add_argument(
-            '-D', '--downloader',
-            default='local',
-            help='Set downloader. Value: {local, rhpkg, none}. Default: local',
+        help_message = (
+            'Set download type. '
+            'Value: {local, rhpkg, none}. Default: none'
         )
-        help_message = 'Set builder. Value: {mock, copr, dummy, custom}. ' + \
-            'Default: dummy'
         parser.add_argument(
-            '-B', '--builder',
+            '-D', '--download',
+            default='none',
+            help=help_message,
+        )
+        help_message = (
+            'Set build type. '
+            'Value: {mock, copr, dummy, custom}. Default: dummy'
+        )
+        parser.add_argument(
+            '-B', '--build',
             default='dummy',
             help=help_message,
         )
-        help_message = 'Change work-directory to DIR. ' + \
+        help_message = (
+            'Change work-directory to DIR. '
             'Default is using creatd tmp directory.'
+        )
         parser.add_argument(
             '-C', '--work-directory',
             help=help_message,
@@ -101,8 +109,10 @@ class Application(object):
             help='Git branch used in SCL package if downloader is rhpkg.',
         )
         current_dir = os.getcwd()
-        help_message = 'Package source directory used ' + \
+        help_message = (
+            'Package source directory used '
             'if downloader is local. Default is current directory.'
+        )
         parser.add_argument(
             '-s', '--source-directory',
             default=current_dir,

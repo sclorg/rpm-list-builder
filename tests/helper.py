@@ -23,7 +23,7 @@ def pushd(new_dir):
 def pushd_tmp_dir():
     tmp_dir = None
     try:
-        tmp_dir = tempfile.mkdtemp(prefix='rhscl-builder-tmp-')
+        tmp_dir = tempfile.mkdtemp(prefix='sclrbh-tmp-')
         with pushd(tmp_dir):
             yield
     finally:

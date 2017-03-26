@@ -1,6 +1,6 @@
 import logging
 
-from rhsclbuilder.builder.base import BaseBuilder
+from sclrbh.builder.base import BaseBuilder
 
 LOG = logging.getLogger(__name__)
 

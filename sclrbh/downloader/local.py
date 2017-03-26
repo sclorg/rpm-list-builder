@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 
-from rhsclbuilder.downloader.base import BaseDownloader
+from sclrbh.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 
