@@ -2,7 +2,7 @@ PYTHON=python3
 PIP=pip3
 VENV_DIR=venv
 
-default: test
+default: test-all
 .PHONY: default
 
 clean:

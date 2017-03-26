@@ -7,7 +7,7 @@ LOG = logging.getLogger(__name__)
 
 
 class MockBuilder(BaseBuilder):
-    """A builder class for Copr."""
+    """A builder class for Mock."""
 
     def before_run(self, work, **kwargs):
         mock_config = kwargs['mock_config']

@@ -46,6 +46,9 @@ Otherwise run appplication to install the application directly.
 
     $ pip3 install .
 
+## Usage
+
+See [Users Guide](docs/users_guide.md).
 
 ## Contributing
 
