@@ -125,8 +125,19 @@ work_directory/
 
 ## Tutorial
 
-### Select download type
+1. First of all, run below command to see the command help.
 
+        $ sclrbh -h
+
+2. Below is `sclrbh`'s basic form. You have to set proper download type, build type, recipe file, reicpe ID. If you omit `--download`, `--build`, the default values are used. You can also use short option name too. See the command help.
+
+        $ sclrbh \
+          --download DOWNLOAD_TYPE \
+          --build BUILD_TYPE \
+          RECIPE_FILE \
+          RECIPE_ID
+
+### Select download type
 
 ### Select build type
 
@@ -134,7 +145,8 @@ work_directory/
 
 #### Copr build
 
-1. Prepare copr repo to build.
+1. Prepare copr repo to build by yourself.
+   The feature to create the copr repo by script is still not supported.
 
 2. If you want to delete pacakages in the copr, enter
 
@@ -143,9 +155,8 @@ work_directory/
 3. If you want to build from pacakges in your local (= SOURCE_DIRECTORY), enter
 
         $ sclrbh \
-          -D local \
-          -s SOURCE_DIRECTORY \
-          -C COPR_REPO \
+          ...
+          --copr-repo COPR_REPO \
           RECIPE_FILE \
           RECIPE_ID
 
