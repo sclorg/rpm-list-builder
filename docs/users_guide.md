@@ -56,6 +56,8 @@ rh-ror50:
 
 #### Source directory
 
+If you want to build from your packages on SOURCE_DIRECTORY in local environment. The SOURCE_DIRECTORY is like this. Just put the packages in same directory.
+
 ```
 source_directory/
 ├── rh-ror50
@@ -84,6 +86,10 @@ source_directory/
 ```
 
 #### Work directory
+
+1. Application creates work directory to build. Each subdirectory has number directory that means the order of the build. The number directory name may be zero padding (`0..00N`) by considering the maxinum number of packages in the recipe file.
+
+2. The application rename original spec file to `foo.spec.orig`, and create new file `foo.spec` that is editted to inject macros definition in the recipe file.
 
 ```
 work_directory/
