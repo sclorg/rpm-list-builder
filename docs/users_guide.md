@@ -223,10 +223,10 @@ work_directory/
           RECIPE_FILE \
           RECIPE_ID
 
-2. What is the custom file? See [sample files](../tests/fixtures/custom). It is YAML file like `.travis.yml`.
+2. What is the custom file? See [sample custom files](../tests/fixtures/custom). It is YAML file like `.travis.yml`. You can write shell script in the file.
 
-    * `before_script`: Write commands to run before build.
-    * `script`: Write commands to run for each packages in the pacakges directory.
+  * `before_script`: Write commands to run before build.
+  * `script`: Write commands to run for each packages in the pacakges directory.
 
 #### Don't build
 
