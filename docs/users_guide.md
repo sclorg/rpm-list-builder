@@ -129,7 +129,7 @@ work_directory/
 
         $ sclrbh -h
 
-2. Below is `sclrbh`'s basic form. You have to set proper download type, build type, recipe file, reicpe ID. If you omit `--download`, `--build`, the default values are used. You can also use short option name too. See the command help.
+2. Below is `sclrbh`'s basic form. You have to set proper download type, build type, recipe file, reicpe ID. If you omit `--download`, `--build`, the default values are used. You can also use short option name too. See the command help for more detail.
 
         $ sclrbh \
           --download DOWNLOAD_TYPE \
@@ -139,25 +139,110 @@ work_directory/
 
 ### Select download type
 
+#### Local
+
+1. If you have not registered your pacakges to the respository yet, you may want to build from your pacakges on SOURCE_DIRECTORY in local environment. In the case, run
+
+        $ sclrbh \
+          --download local \
+          --source-directory SOURCE_DIRECTORY \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
+#### Rhpkg
+
+1. If you have registered your packages to the repository, you may want to build from the packages in repository. In the case, run with `--branch`.
+
+        $ sclrbh \
+          --download rhpkg \
+          --branch BRANCH \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
+### Specify work directory
+
+1. As a default behavior of the application creates work directory to `/tmp/sclrbh-XXXXXXXX`. However you want to specifiy the directory, run with `--work-directory`.
+
+        $ sclrbh \
+          ...
+          --work-directory WORK_DIRECTORY \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
 ### Select build type
 
 #### Mock Build
+
+1. If you wan to build with mock, run with `--mock-config` (it is same with `mock -r`).
+
+        $ sclrbh \
+          ...
+          --build mock \
+          --mock-config MOCK_CONFIG \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
 
 #### Copr build
 
 1. Prepare copr repo to build by yourself.
    The feature to create the copr repo by script is still not supported.
 
-2. If you want to delete pacakages in the copr, enter
+2. If you want to delete pacakages in the copr, run
 
         $ scripts/delete_copr_pkgs COPR_REPO
 
-3. If you want to build from pacakges in your local (= SOURCE_DIRECTORY), enter
+3. To build for Copr, enter
 
         $ sclrbh \
           ...
+          --build copr \
           --copr-repo COPR_REPO \
+          ...
           RECIPE_FILE \
           RECIPE_ID
 
 #### Custom build
+
+1. You may want to customize your build way or build with another way. In case, you can run with `--custom-file`.
+
+        $ sclrbh \
+          ...
+          --build custom \
+          --custom-file CUSTOM_FILE \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
+2. What is the custom file? See [sample files](../tests/fixtures/custom). It is YAML file like `.travis.yml`.
+
+    * `before_script`: Write commands to run before build.
+    * `script`: Write commands to run for each packages in the pacakges directory.
+
+#### Don't build
+
+1. If you don't want to build, only want to download the pacakges to create work directory. and later want to build only. In case, run **without** `--build` or with `--build dummy`. Then you can see the log for the dummy build. This is good to check your recipe file.
+
+        $ sclrbh \
+          ...
+          --build dummy \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
+
+### Resume from any position of pacakges
+
+1. If your build was failed during the process due to some reasons, you want to resume your build. In case run with `--work-directory` and  `--resume` **without** `--download`. The resume number is same with the number directory name in work directory. zero padding is ignored. That is ex. 01 => 1, 012 => 12.
+
+        $ sclrbh \
+          ...
+          --build something \
+          --work-directory WORK_DIRECTORY \
+          --resume 35 \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
