@@ -1,9 +1,6 @@
 - Add Copr build to integration.
 - Improve logging, to set log level by a config file.
-- Add example and use cases document.
-  Explain techniques to rapidly identify data structures, algorithms and
-  determine what the code is doing.
-  Ref: http://docs.python-guide.org/en/latest/writing/reading/
+- Split internal logic "rhpkg" to publish the tool on github.
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.
   The test script is so complecated to maintain by bash.
