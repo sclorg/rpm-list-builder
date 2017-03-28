@@ -32,15 +32,15 @@ class Recipe(object):
 
     def each_normalized_package(self):
         packages = self._scl['packages']
-        package_dict = {}
         for package in packages:
+            package_dict = {}
             # String or hash
             if isinstance(package, str):
                 package_dict['name'] = package
             elif isinstance(package, dict):
                 keys = list(package.keys())
                 name = keys[0]
-                if package[name] is None:
+                if not package[name]:
                     raise ValueError('Recipe package %s is invalid format.' %
                                      name)
                 package_dict = package[name]

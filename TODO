@@ -1,17 +1,33 @@
+## Feature
+
+- Improve logging, --debug (-d) option.
+  Ref: http://docs.python-guide.org/en/latest/writing/logging/
+- Custom download
+- Split internal logic "rhpkg" to publish the tool on github.
+- Create Copr repo from script by a recipe file's requires, install information.
+
+## Bug
+
+- retry feature does not work.
+
+## Refactoring
+
+- Change project/repository name
+  from "scl-rebuild-helper2" to new one without using "scl",
+  such as "rpm-rebuild_helper"
+  A range of the tool responsibility is not only building SCL, but also
+  "building continual packages by recipe file"
+  Replace "scl" keyword to another word.
+- Improve exception info during the build.
+  Add package, num_name, application directory to the exception.
 - Add Copr build to integration.
-- Improve logging, to set log level by a config file.
-- Add example and use cases document.
-  Explain techniques to rapidly identify data structures, algorithms and
-  determine what the code is doing.
-  Ref: http://docs.python-guide.org/en/latest/writing/reading/
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.
-  The test script is so complecated to maintain by bash.
-- More Pythonic. Refer flask source structure.
+  Current bash test script is so complecated to maintain by bash.
+- Do more Pythonic (Python Style).
+  It's good to refer flask source structure.
   - downloader directory => downloaders.py
   - builders directory => builders.py
-- Create Copr repo from script by a recipe file's requires, install information.
-  Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Run the integration test from tox.
 - Check other TODOs
   $ grep -r TODO .
