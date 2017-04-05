@@ -29,7 +29,7 @@
   - downloader directory => downloaders.py
   - builders directory => builders.py
 - Run the integration test from tox.
-- Add shell code style task to Makefile for "sh -c", "bashate", "shellcheck".
+- Add shell code style task to Makefile for "sh -n", "bashate", "shellcheck".
   make test-style
     => make flask8
     => make test-style-bash
