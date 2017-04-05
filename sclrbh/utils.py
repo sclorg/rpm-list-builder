@@ -45,16 +45,30 @@ def run_cmd_with_capture(cmd, **kwargs):
 
 
 def run_cmd(cmd, **kwargs):
+    returncode = None
+    stdout = ''
+    stderr = ''
     try:
         LOG.debug('CMD: %s', cmd)
-        if 'check' not in kwargs:
-            kwargs['check'] = True
+        check = True
+        if 'check' in kwargs:
+            check = kwargs['check']
+            kwargs.pop('check', None)
         # Use shell option to use wildcard "*".
         kwargs['shell'] = True
 
-        result = subprocess.run(cmd, **kwargs)
-        p(result)
-        return result
+        # result = subprocess.run(cmd, **kwargs)
+        proc = subprocess.Popen(cmd, **kwargs)
+        stdout, stderr = proc.communicate()
+        returncode = proc.returncode
+        LOG.debug('Return Code: %s', returncode)
+        LOG.debug('Stdout: %s', stdout)
+        LOG.debug('Stderr: %s', stderr)
+        if check and returncode != 0:
+            raise subprocess.CalledProcessError(
+                returncode, cmd, stdout, stderr
+            )
+        return subprocess.CompletedProcess(cmd, returncode, stdout, stderr)
     except subprocess.CalledProcessError as e:
         LOG.error('CMD: %s', e.cmd)
         LOG.error('Return Code: %s', e.returncode)

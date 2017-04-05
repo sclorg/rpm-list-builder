@@ -22,13 +22,16 @@ Main --> Recipe (recipe file)
  +-----> Download +-----> Get pacakges from local directory
  |                |
  |                +-----> Get pacakges from repository by rhpkg clone
+ |                |
+ |                +-----> Custom Download -> Define the behavior
+ |                                           by the config file.
  |
  +-----> Build ---+-----> Copr Build to Copr
                   |
                   +-----> Mock Build to Mock
                   |
-                  +-----> Custome Build -> Define the behavior
-                                           by the config file.
+                  +-----> Custom Build -> Define the behavior
+                                          by the config file.
 ```
 
 ### Relationship of Recipe file, Source directory and Work directory
@@ -167,6 +170,25 @@ work_directory/
           RECIPE_FILE \
           RECIPE_ID
 
+#### Custom download
+
+1. You may want to customize your download way. In case, you can run with `--custom-file`.
+
+        $ sclrbh \
+          ...
+          --download custom \
+          --custom-file CUSTOM_FILE \
+          ...
+          RECIPE_FILE \
+          RECIPE_ID
+
+2. What is the custom file? See [sample custom files](../tests/fixtures/custom). It is YAML file like `.travis.yml`. You can write shell script in the file.
+
+  * `before_download`: Write commands to run before build.
+  * `download`: Write commands to run for each packages in the pacakges directory. You can use environment variable `PKG` to describe the package name.
+
+
+
 ### Specify work directory
 
 1. As a default behavior of the application creates work directory to `/tmp/sclrbh-XXXXXXXX`. However you want to specifiy the directory, run with `--work-directory`.
@@ -213,7 +235,7 @@ work_directory/
 
 #### Custom build
 
-1. You may want to customize your build way or build with another way. In case, you can run with `--custom-file`.
+1. You may want to customize your build way. In case, you can run with `--custom-file`.
 
         $ sclrbh \
           ...
@@ -225,8 +247,8 @@ work_directory/
 
 2. What is the custom file? See [sample custom files](../tests/fixtures/custom). It is YAML file like `.travis.yml`. You can write shell script in the file.
 
-  * `before_script`: Write commands to run before build.
-  * `script`: Write commands to run for each packages in the pacakges directory.
+  * `before_build`: Write commands to run before build.
+  * `build`: Write commands to run for each packages in the pacakges directory. You can use environment variable `PKG` to describe the package name.
 
 #### Don't build
 

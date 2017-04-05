@@ -9,6 +9,7 @@
 ## Bug
 
 - retry feature does not work.
+  => Maybe fixed.
 
 ## Refactoring
 
@@ -20,6 +21,7 @@
   Replace "scl" keyword to another word.
 - Improve exception info during the build. [high]
   Add package, num_name, application directory to the exception.
+  => Maybe fixed.
 - Add Copr build to integration.
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.

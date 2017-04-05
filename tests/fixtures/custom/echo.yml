@@ -1,4 +1,19 @@
-script:
+before_download:
+  - echo "This command is run before download."
   - pwd
-  - echo aaa
-  - echo bbb && echo ccc
+download:
+  - echo "This command is run for each package download."
+  - |
+    echo "Downloading PKG: ${PKG}"
+    if [ "${PKG}" != "" ]; then
+        mkdir "${PKG}"
+        touch "${PKG}/${PKG}.spec"
+    fi
+  - pwd
+before_build:
+  - echo "This command is run before build."
+  - pwd
+build:
+  - echo "This command is run for each package build."
+  - "echo Building PKG: ${PKG}"
+  - pwd

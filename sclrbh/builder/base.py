@@ -1,7 +1,9 @@
 import logging
 import os
 import re
-from retrying import retry
+import sys
+
+import retrying
 
 # from sclrbh import utils
 
@@ -40,7 +42,7 @@ class BaseBuilder(object):
         return instance
 
     def run(self, work, **kwargs):
-        self.before_run(work, **kwargs)
+        self.before(work, **kwargs)
 
         is_resume = 'resume' in kwargs and kwargs['resume']
         resume_num = 0
@@ -48,20 +50,27 @@ class BaseBuilder(object):
             resume_num = kwargs['resume']
 
         for package_dict, num_name in work.each_package_dir():
-            if is_resume:
-                num = int(num_name)
-                if num < resume_num:
-                    continue
+            try:
+                if is_resume:
+                    num = int(num_name)
+                    if num < resume_num:
+                        continue
 
-            self.prepare(package_dict)
-            self.build(package_dict, **kwargs)
+                self.prepare(package_dict)
+                self.build_with_retrying(package_dict, **kwargs)
+            except Exception:
+                message = 'pacakge_dict: {0}, num: {1}'.format(
+                    package_dict, num_name)
+                tb = sys.exc_info()[2]
+                raise RuntimeError(message).with_traceback(tb)
 
-        self.after_run(work, **kwargs)
+        self.after(work, **kwargs)
+        return True
 
-    def before_run(self, work, **kwargs):
+    def before(self, work, **kwargs):
         pass
 
-    def after_run(self, work, **kwargs):
+    def after(self, work, **kwargs):
         pass
 
     def prepare(self, package_dict):
@@ -74,7 +83,10 @@ class BaseBuilder(object):
             self.edit_spec_file_by_replaced_macros(
                 spec_file, package_dict['replaced_macros'])
 
-    @retry(stop_max_attempt_number=3)
+    @retrying.retry(stop_max_attempt_number=3)
+    def build_with_retrying(self, package_dict, **kwargs):
+        self.build(package_dict, **kwargs)
+
     def build(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')
 

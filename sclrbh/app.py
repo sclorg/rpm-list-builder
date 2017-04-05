@@ -79,7 +79,7 @@ class Application(object):
         # General options
         help_message = (
             'Set download type. '
-            'Value: {local, rhpkg, none}. Default: none'
+            'Value: {local, rhpkg, none, custom}. Default: none'
         )
         parser.add_argument(
             '-D', '--download',
@@ -133,7 +133,7 @@ class Application(object):
             help='Copr repo used if builder is copr',
         )
         parser.add_argument(
-            '--custom-file',
+            '-u', '--custom-file',
             help='Custom script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
