@@ -1,25 +1,27 @@
 ## Feature
-
+- Show options specified by user in log file at first of running. [high]
+- Custom download [high]
 - Improve logging, --debug (-d) option.
   Ref: http://docs.python-guide.org/en/latest/writing/logging/
-- Custom download
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
 
 ## Bug
 
 - retry feature does not work.
+  => Maybe fixed.
 
 ## Refactoring
 
-- Change project/repository name
+- Change project/repository name [high]
   from "scl-rebuild-helper2" to new one without using "scl",
   such as "rpm-rebuild_helper"
   A range of the tool responsibility is not only building SCL, but also
   "building continual packages by recipe file"
   Replace "scl" keyword to another word.
-- Improve exception info during the build.
+- Improve exception info during the build. [high]
   Add package, num_name, application directory to the exception.
+  => Maybe fixed.
 - Add Copr build to integration.
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.
@@ -29,5 +31,13 @@
   - downloader directory => downloaders.py
   - builders directory => builders.py
 - Run the integration test from tox.
+- Add shell code style task to Makefile for "sh -n", "bashate", "shellcheck".
+  make test-style
+    => make flask8
+    => make test-style-bash
+      for bash_file in bash_files:
+         check with "sh -c"
+         check with "bashate"
+         check with "shellcheck"
 - Check other TODOs
   $ grep -r TODO .

@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 class MockBuilder(BaseBuilder):
     """A builder class for Mock."""
 
-    def before_run(self, work, **kwargs):
+    def before(self, work, **kwargs):
         mock_config = kwargs['mock_config']
         if not mock_config:
             raise ValueError('mock_config is required.')

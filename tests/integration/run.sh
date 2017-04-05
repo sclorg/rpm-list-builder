@@ -121,6 +121,16 @@ download_by_rhpkg_and_build_with_dummy_test() {
     return "${?}"
 }
 
+download_with_custom_and_build_with_dummy_test() {
+    "${CLI}" \
+        --download custom \
+        --build dummy \
+        --custom-file "${CUSTOM_DIR}/echo.yml" \
+        "${RECEIPE_TEST_MIN_FILE}" \
+        "${RECIPE_ID}"
+    return "${?}"
+}
+
 build_only_test() {
     prepare_work_dir
 
@@ -168,7 +178,7 @@ build_only_with_custom_mock_test() {
     "${CLI}" \
         --build custom \
         --work-directory "${WORK_DIR}" \
-        --custom-file "${CUSTOM_DIR}/mock.yml" \
+        --custom-file "${CUSTOM_DIR}/rhpkg_mock.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     return "${?}"
@@ -187,16 +197,50 @@ build_only_resume_test() {
     return "${?}"
 }
 
+download_and_build_with_custom_echo_test() {
+    local test_work_dir=""
+
+    test_work_dir="$(make_test_dir)"
+    "${CLI}" \
+        --download custom \
+        --build custom \
+        --work-directory "${test_work_dir}" \
+        --custom-file "${CUSTOM_DIR}/echo.yml" \
+        "${RECEIPE_TEST_MACRO_FILE}" \
+        "${RECIPE_ID}"
+    return "${?}"
+}
+
+download_and_build_with_custom_mock_test() {
+    local test_work_dir=""
+
+    test_work_dir="$(make_test_dir)"
+    "${CLI}" \
+        --download custom \
+        --build custom \
+        --work-directory "${test_work_dir}" \
+        --custom-file "${CUSTOM_DIR}/rhpkg_mock.yml" \
+        "${RECEIPE_TEST_MIN_FILE}" \
+        "${RECIPE_ID}"
+    return "${?}"
+}
+
 run_test() {
     test_funcs=(
         download_only_test
         download_from_local_and_build_with_dummy_test
         download_by_rhpkg_and_build_with_dummy_test
+        download_with_custom_and_build_with_dummy_test
         build_only_test
+        # The test takes long time
         build_only_with_mock_test
         build_only_with_custom_echo_test
+        # The test takes long time
         build_only_with_custom_mock_test
         build_only_resume_test
+        download_and_build_with_custom_echo_test
+        # The test takes long time
+        download_and_build_with_custom_mock_test
     )
     rm -f "${LOG_FILE}" || :
     local ret_status="0"

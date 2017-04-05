@@ -7,10 +7,15 @@ SCL Rebuild Helper (sclrbh) helps you to build packages for Red Hat Software Col
 
 sclrbh ...
 
-* Supports several builds: Mock(`mock`), Copr(`copr-cli`) and custom build. You can customize the build way by config file to use `koji`, `brew`, `dnf` and etc.
+* Supports several builds
+  * Mock(`mock`)
+  * Copr(`copr-cli`)
+  * Custom build by config file.
+     You can customize the build with `rhpkg`, `fedpkg`, `koji`, `brew`, `dnf` and etc.
 * Supports the way to get packages by recipe file.
   * Copy from local directory
   * Download by `rhpkg clone`.
+  * Custom download. You can customize the way with `rhpkg`, `fedpkg`, and etc.
 * Supports retry feature.
 * Supports build by resume from any positon of the recipe file.
 
