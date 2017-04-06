@@ -48,8 +48,8 @@ def run_cmd(cmd, **kwargs):
     returncode = None
     stdout = ''
     stderr = ''
+    proc = None
     try:
-        LOG.debug('CMD: %s', cmd)
         check = True
         if 'check' in kwargs:
             check = kwargs['check']
@@ -57,21 +57,26 @@ def run_cmd(cmd, **kwargs):
         # Use shell option to use wildcard "*".
         kwargs['shell'] = True
 
-        # result = subprocess.run(cmd, **kwargs)
+        LOG.debug('CMD: %s, kwargs: %s', cmd, repr(kwargs))
+        if 'env' in kwargs:
+            # Keep current environment variables
+            env = os.environ
+            for key, value in list(kwargs['env'].items()):
+                env[key] = value
+            kwargs['env'] = env
+
         proc = subprocess.Popen(cmd, **kwargs)
         stdout, stderr = proc.communicate()
         returncode = proc.returncode
-        LOG.debug('Return Code: %s', returncode)
-        LOG.debug('Stdout: %s', stdout)
-        LOG.debug('Stderr: %s', stderr)
         if check and returncode != 0:
+            LOG.error('CMD: %s', cmd)
+            LOG.error('Return Code: %s', returncode)
+            LOG.error('Stdout: %s', stdout)
+            LOG.error('Stderr: %s', stderr)
             raise subprocess.CalledProcessError(
                 returncode, cmd, stdout, stderr
             )
         return subprocess.CompletedProcess(cmd, returncode, stdout, stderr)
-    except subprocess.CalledProcessError as e:
-        LOG.error('CMD: %s', e.cmd)
-        LOG.error('Return Code: %s', e.returncode)
-        LOG.error('Stdout: %s', e.stdout.decode('utf-8').split('\n'))
-        LOG.error('Stderr: %s', e.stderr.decode('utf-8').split('\n'))
+    except Exception as e:
+        proc.kill()
         raise e
