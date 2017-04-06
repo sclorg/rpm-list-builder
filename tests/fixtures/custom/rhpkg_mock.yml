@@ -1,7 +1,8 @@
 download:
-  - "rhpkg co ${PKG}"
-  - "cd ${PKG}"
-  - git checkout rhscl-2.4-rh-ror50-rhel-7
+  - |
+    rhpkg co "${PKG}"
+    cd "${PKG}"
+    git checkout rhscl-2.4-rh-ror50-rhel-7
 before_build:
   - mock -r rhscl-2.4-rh-ror50-rhel-7-x86-64 --scrub=all
 build:
