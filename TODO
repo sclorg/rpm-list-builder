@@ -4,6 +4,7 @@
   Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
+- Support Ruby 2.7, 3.4, 3.5
 
 ## Bug
 
@@ -12,12 +13,6 @@
 
 ## Refactoring
 
-- Change project/repository name [high]
-  from "scl-rebuild-helper2" to new one without using "scl",
-  such as "rpm-rebuild_helper"
-  A range of the tool responsibility is not only building SCL, but also
-  "building continual packages by recipe file"
-  Replace "scl" keyword to another word.
 - Improve exception info during the build. [high]
   Add package, num_name, application directory to the exception.
   => Maybe fixed.

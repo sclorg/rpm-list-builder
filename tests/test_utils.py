@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 from rpmlb import utils
 
@@ -29,7 +30,7 @@ def test_pushd():
 
 def test_run_cmd():
     result = utils.run_cmd_with_capture('echo a')
-    assert isinstance(result, subprocess.CompletedProcess)
+    assert isinstance(result, utils.CompletedProcess)
     assert result.returncode == 0
     assert result.stdout == b'a\n'
     assert result.stderr == b''
@@ -50,6 +51,7 @@ def test_run_cmd_exception():
     assert result_e.cmd == cmd
     assert result_e.returncode != 0
     assert result_e.output == b''
-    assert result_e.stdout == b''
-    assert result_e.stderr == \
-        b'ls: cannot access \'abc\': No such file or directory\n'
+    if sys.version_info >= (3, 5):
+        assert result_e.stdout == b''
+        assert result_e.stderr == \
+            b'ls: cannot access \'abc\': No such file or directory\n'

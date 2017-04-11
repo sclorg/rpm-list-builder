@@ -60,6 +60,10 @@ venv-integration-test:
 	deactivate
 .PHONY: venv-test-integration
 
+tox-notest:
+	tox --notest
+.PHONY: tox-notest
+
 tox:
 	tox
 .PHONY: tox

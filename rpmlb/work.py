@@ -56,11 +56,9 @@ class Work(object):
                 yield package_dict, num_name
 
             count += 1
-        return True
 
     def each_package_dir(self):
         for package_dict, num_name in self.each_num_dir():
             package = package_dict['name']
             with utils.pushd(package):
                 yield package_dict, num_name
-        return True

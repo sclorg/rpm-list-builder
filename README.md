@@ -22,8 +22,8 @@ rpmlb ...
 
 ## Supported platforms
 
-* Python 3 (Recommended)
-* Python 2.7
+* Python 3.6 (Recommended), 3.5, 3.4
+* Python 2.7 (Not recommended)
 
 ## Install
 

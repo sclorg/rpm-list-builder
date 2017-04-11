@@ -61,8 +61,11 @@ class BaseBuilder(object):
             except Exception:
                 message = 'pacakge_dict: {0}, num: {1}'.format(
                     package_dict, num_name)
-                tb = sys.exc_info()[2]
-                raise RuntimeError(message).with_traceback(tb)
+                error = RuntimeError(message)
+                if sys.version_info[0] >= 3:
+                    tb = sys.exc_info()[2]
+                    error = error.with_traceback(tb)
+                raise error
 
         self.after(work, **kwargs)
         return True

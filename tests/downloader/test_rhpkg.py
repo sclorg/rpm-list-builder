@@ -1,9 +1,11 @@
-# import os
-# import subprocess
-from unittest.mock import MagicMock
+import sys
 
 from rpmlb.downloader.rhpkg import RhpkgDownloader
-# import helper
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 def test_init():
@@ -13,7 +15,7 @@ def test_init():
 
 def test_download():
     downloader = RhpkgDownloader()
-    downloader.do_rhpkg_and_checkout = MagicMock(return_value=True)
+    downloader.do_rhpkg_and_checkout = mock.MagicMock(return_value=True)
     package_dict = {'name': 'a'}
     branch = 'private-foo'
     downloader.download(package_dict, branch=branch)
