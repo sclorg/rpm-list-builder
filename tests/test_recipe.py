@@ -12,11 +12,11 @@ def test_init(ok_recipe):
     assert ok_recipe
 
 
-def test_scl(ok_recipe):
-    assert ok_recipe.scl
+def test_recipe(ok_recipe):
+    assert ok_recipe.recipe
 
 
-def test_scl_not_found():
+def test_recipe_not_found():
     with pytest.raises(KeyError):
         Recipe('tests/fixtures/recipes/ror.yml', 'dummy')
 
