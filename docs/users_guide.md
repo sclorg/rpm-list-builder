@@ -5,12 +5,19 @@ About the example, you can refer an integration test script [tests/integration/r
 
 ## Architecture
 
-This application is to to help rebuild packages.
+The application is to help building a list of RPM packages.
 
 And it is structured from several parts that are "Main application", "Recipe", "Download", "Build", "Work directory".
 
-"Main application" is directer program.
-That gets "Recipe" data from recipe file.
+"Main" is a main application that will get "Recipe" data from recipe file for a defined list of the RPM packages and download and build them.
+
+"Download" is how to get a list of building RPM packages.
+
+"Build" is how to build the list of the RPM packages.
+
+"Main" will order "Download" and "Build".
+
+"Work directory" will manage working directory strucure. See below section for detail.
 
 
 ### Structured factors
