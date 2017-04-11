@@ -1,6 +1,5 @@
 ## Feature
 - Show options specified by user in log file at first of running. [high]
-- Custom download [high]
 - Improve logging, --debug (-d) option.
   Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Split internal logic "rhpkg" to publish the tool on github.
@@ -36,7 +35,7 @@
     => make flask8
     => make test-style-bash
       for bash_file in bash_files:
-         check with "sh -c"
+         check with "sh -n"
          check with "bashate"
          check with "shellcheck"
 - Check other TODOs
