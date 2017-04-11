@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from sclrbh import utils
+from rpmlb import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Work(object):
             if not os.path.exists(working_dir):
                 os.makedirs(working_dir)
         else:
-            working_dir = tempfile.mkdtemp(prefix='sclrbh-')
+            working_dir = tempfile.mkdtemp(prefix='rpmlb-')
         LOG.info('Working directory: %s', working_dir)
         self._working_dir = working_dir
 

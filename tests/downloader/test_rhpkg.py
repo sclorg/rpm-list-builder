@@ -2,7 +2,7 @@
 # import subprocess
 from unittest.mock import MagicMock
 
-from sclrbh.downloader.rhpkg import RhpkgDownloader
+from rpmlb.downloader.rhpkg import RhpkgDownloader
 # import helper
 
 

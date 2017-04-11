@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 from unittest.mock import Mock
 from unittest.mock import call
 
-from sclrbh.builder.base import BaseBuilder
+from rpmlb.builder.base import BaseBuilder
 
 
 def test_init():

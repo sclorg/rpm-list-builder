@@ -15,7 +15,7 @@ install:
 .PHONY: install
 
 uninstall:
-	$(PIP) uninstall sclrbh
+	$(PIP) uninstall rpmlb
 .PHONY: uninstall
 
 # It takes about 7 mins.

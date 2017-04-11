@@ -2,11 +2,11 @@ import argparse
 import logging
 import os
 
-import sclrbh
-from sclrbh.recipe import Recipe
-from sclrbh.builder.base import BaseBuilder
-from sclrbh.downloader.base import BaseDownloader
-from sclrbh.work import Work
+import rpmlb
+from rpmlb.recipe import Recipe
+from rpmlb.builder.base import BaseBuilder
+from rpmlb.downloader.base import BaseDownloader
+from rpmlb.work import Work
 
 LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
@@ -16,8 +16,8 @@ class Application(object):
     """An application class."""
 
     def __init__(self):
-        self._program = 'sclrbh'
-        self._version = sclrbh.__version__
+        self._program = 'rpmlb'
+        self._version = rpmlb.__version__
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)

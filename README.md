@@ -1,18 +1,19 @@
-# SCL Rebuild Helper
+# RPM List Builder
 
-SCL Rebuild Helper (sclrbh) helps you to build packages for Red Hat Software Collection from the [recipe files](https://github.com/sclorg/rhscl-rebuild-recipes).
+RPM List Builder (rpmlb) helps you to build a list of defined RPM packages including Red Hat Software Collection (SCL) continually from the [recipe file](https://github.com/sclorg/rhscl-rebuild-recipes).
 
 
 ## Features
 
-sclrbh ...
+rpmlb ...
 
-* Supports several builds
+* Supports building a list of RPMs and SCL that is a extension of the RPM packages.
+* Supports several build types
   * Mock(`mock`)
   * Copr(`copr-cli`)
   * Custom build by config file.
      You can customize the build with `rhpkg`, `fedpkg`, `koji`, `brew`, `dnf` and etc.
-* Supports the way to get packages by recipe file.
+* Supports several types to get packages by recipe file.
   * Copy from local directory
   * Download by `rhpkg clone`.
   * Custom download. You can customize the way with `rhpkg`, `fedpkg`, and etc.
@@ -42,7 +43,7 @@ Run below command to install application on virtualenv.
 Run below command to check installed command.
 
     $ source venv/bin/activate
-    (venv) $ venv/bin/sclrbh -h
+    (venv) $ venv/bin/rpmlb -h
     (venv) $ deactivate
 
 ### Install directly by pip

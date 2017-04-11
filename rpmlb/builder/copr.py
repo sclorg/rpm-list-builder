@@ -1,7 +1,7 @@
 import logging
 
-from sclrbh.builder.base import BaseBuilder
-from sclrbh import utils
+from rpmlb.builder.base import BaseBuilder
+from rpmlb import utils
 
 LOG = logging.getLogger(__name__)
 

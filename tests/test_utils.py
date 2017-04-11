@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from sclrbh import utils
+from rpmlb import utils
 
 
 def test_camelize():
@@ -10,10 +10,10 @@ def test_camelize():
 
 
 def test_get_class():
-    cls = utils.get_class('sclrbh.recipe.Recipe')
+    cls = utils.get_class('rpmlb.recipe.Recipe')
     assert cls
     cls = utils.get_class(
-        'sclrbh.downloader.local.LocalDownloader'
+        'rpmlb.downloader.local.LocalDownloader'
     )
     assert cls
 

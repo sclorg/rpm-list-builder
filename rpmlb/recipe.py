@@ -1,6 +1,6 @@
 import logging
 
-from sclrbh.yaml import Yaml
+from rpmlb.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
 

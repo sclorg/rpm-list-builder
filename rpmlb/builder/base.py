@@ -5,7 +5,7 @@ import sys
 
 import retrying
 
-# from sclrbh import utils
+# from rpmlb import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -19,23 +19,23 @@ class BaseBuilder(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'sclrbh.builder.{0}.{1}Builder'.format(
+        # class_name = 'rpmlb.builder.{0}.{1}Builder'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'mock':
-            from sclrbh.builder.mock import MockBuilder
+            from rpmlb.builder.mock import MockBuilder
             instance = MockBuilder()
         elif name == 'copr':
-            from sclrbh.builder.copr import CoprBuilder
+            from rpmlb.builder.copr import CoprBuilder
             instance = CoprBuilder()
         elif name == 'custom':
-            from sclrbh.builder.custom import CustomBuilder
+            from rpmlb.builder.custom import CustomBuilder
             instance = CustomBuilder()
         elif name == 'dummy':
-            from sclrbh.builder.dummy import DummyBuilder
+            from rpmlb.builder.dummy import DummyBuilder
             instance = DummyBuilder()
         else:
             raise ValueError('name is invalid.')
@@ -98,7 +98,7 @@ class BaseBuilder(object):
         try:
             fh_r = open(spec_file_origin, 'r')
             fh_w = open(spec_file, 'w')
-            fh_w.write('# Edited by sclrbh\n')
+            fh_w.write('# Edited by rpmlb\n')
             yield(fh_r, fh_w)
         finally:
             if fh_w:

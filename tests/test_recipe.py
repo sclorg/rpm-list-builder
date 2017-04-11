@@ -1,6 +1,6 @@
 import pytest
 
-from sclrbh.recipe import Recipe
+from rpmlb.recipe import Recipe
 
 
 @pytest.fixture

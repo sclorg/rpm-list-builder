@@ -1,4 +1,4 @@
-from sclrbh.app import Application
+from rpmlb.app import Application
 
 
 def main(argv=None):

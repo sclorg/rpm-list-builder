@@ -1,6 +1,6 @@
 import logging
 
-from sclrbh.builder.base import BaseBuilder
+from rpmlb.builder.base import BaseBuilder
 
 LOG = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import os
 
-from sclrbh.app import Application
+from rpmlb.app import Application
 
 
 def test_init():

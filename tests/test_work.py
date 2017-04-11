@@ -5,7 +5,7 @@ import tempfile
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 
-from sclrbh.work import Work
+from rpmlb.work import Work
 
 import helper
 
@@ -31,7 +31,7 @@ def test_init_work_directory():
     mock_recipe = MagicMock()
     mock_recipe.num_of_package.return_value = 2
     try:
-        arg_working_dir = tempfile.mkdtemp(prefix='sclrbh-test-')
+        arg_working_dir = tempfile.mkdtemp(prefix='rpmlb-test-')
         work = Work(mock_recipe, work_directory=arg_working_dir)
         assert work
     finally:

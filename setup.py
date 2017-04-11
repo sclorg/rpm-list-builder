@@ -1,19 +1,19 @@
 import setuptools
 
-import sclrbh
+import rpmlb
 
 setuptools.setup(
-    name='sclrbh',
+    name='rpmlb',
     license='GPLv2+',
-    version=sclrbh.__version__,
+    version=rpmlb.__version__,
     description='Software Collection Rebuild Helper',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
     url='https://gitlab.cee.redhat.com/jaruga/rhscl-builder',
     packages=[
-        'sclrbh',
-        'sclrbh.builder',
-        'sclrbh.downloader',
+        'rpmlb',
+        'rpmlb.builder',
+        'rpmlb.downloader',
     ],
     install_requires=[
         'PyYAML',
@@ -21,7 +21,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'sclrbh=sclrbh.cli:main',
+            'rpmlb=rpmlb.cli:main',
         ]
     },
     setup_requires=[

@@ -1,6 +1,6 @@
 import logging
 
-# from sclrbh import utils
+# from rpmlb import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -14,23 +14,23 @@ class BaseDownloader(object):
     @classmethod
     def get_instance(cls, name):
         # TODO: Use reflection.
-        # class_name = 'sclrbh.downloader.{0}.{1}Downloader'.format(
+        # class_name = 'rpmlb.downloader.{0}.{1}Downloader'.format(
         #     name,
         #     utils.camelize(name)
         # )
         # return utils.get_instance(class_name)
         instance = None
         if name == 'local':
-            from sclrbh.downloader.local import LocalDownloader
+            from rpmlb.downloader.local import LocalDownloader
             instance = LocalDownloader()
         elif name == 'rhpkg':
-            from sclrbh.downloader.rhpkg import RhpkgDownloader
+            from rpmlb.downloader.rhpkg import RhpkgDownloader
             instance = RhpkgDownloader()
         elif name == 'none':
-            from sclrbh.downloader.none import NoneDownloader
+            from rpmlb.downloader.none import NoneDownloader
             instance = NoneDownloader()
         elif name == 'custom':
-            from sclrbh.downloader.custom import CustomDownloader
+            from rpmlb.downloader.custom import CustomDownloader
             instance = CustomDownloader()
         else:
             raise ValueError('name is invalid.')

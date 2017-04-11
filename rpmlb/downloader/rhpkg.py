@@ -2,7 +2,7 @@ import logging
 import os
 import subprocess
 
-from sclrbh.downloader.base import BaseDownloader
+from rpmlb.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 
