@@ -221,7 +221,7 @@ work_directory/
 
 2. If you want to delete pacakages in the copr, run
 
-        $ scripts/delete_copr_pkgs COPR_REPO
+        $ scripts/delete_copr_pkgs.sh COPR_REPO
 
 3. To build for Copr, enter
 
