@@ -59,8 +59,8 @@ class BaseBuilder(object):
                 self.prepare(package_dict)
                 self.build_with_retrying(package_dict, **kwargs)
             except Exception:
-                message = 'pacakge_dict: {0}, num: {1}'.format(
-                    package_dict, num_name)
+                message = 'pacakge_dict: {0}, num: {1}, work_dir: {2}'.format(
+                    package_dict, num_name, work.working_dir)
                 error = RuntimeError(message)
                 if sys.version_info[0] >= 3:
                     tb = sys.exc_info()[2]
