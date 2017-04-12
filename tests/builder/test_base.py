@@ -47,6 +47,7 @@ def test_run_exception():
     ]
     mock_work.each_package_dir.return_value = iter(
         zip(package_dicts, num_names))
+    type(mock_work).working_dir = mock.PropertyMock(return_value='work_dir')
 
     called = False
     error_message = None
@@ -56,7 +57,11 @@ def test_run_exception():
         called = True
         error_message = str(e)
     assert called
-    assert error_message == "pacakge_dict: {'name': 'a'}, num: 1"
+    expected_error_message = (
+        "pacakge_dict: {'name': 'a'}, "
+        "num: 1, work_dir: work_dir"
+    )
+    assert error_message == expected_error_message
     if sys.version_info >= (3, 6):
         builder.build.assert_called()
     # bulid should be called 3 times for retry setting.
