@@ -82,7 +82,7 @@ class Application(object):
             'Value: {local, rhpkg, none, custom}. Default: none'
         )
         parser.add_argument(
-            '-D', '--download',
+            '-d', '--download',
             default='none',
             help=help_message,
         )
@@ -91,21 +91,21 @@ class Application(object):
             'Value: {mock, copr, dummy, custom}. Default: dummy'
         )
         parser.add_argument(
-            '-B', '--build',
+            '-b', '--build',
             default='dummy',
             help=help_message,
         )
         help_message = (
-            'Change work-directory to DIR. '
+            'Work-directory to DIR. '
             'Default is using creatd tmp directory.'
         )
         parser.add_argument(
-            '-C', '--work-directory',
+            '-w', '--work-directory',
             help=help_message,
         )
         # Downloader options
         parser.add_argument(
-            '-b', '--branch',
+            '-B', '--branch',
             help='Git branch used in a package if downloader is rhpkg.',
         )
         current_dir = os.getcwd()
@@ -114,7 +114,7 @@ class Application(object):
             'if downloader is local. Default is current directory.'
         )
         parser.add_argument(
-            '-s', '--source-directory',
+            '-S', '--source-directory',
             default=current_dir,
             help=help_message,
         )
@@ -129,11 +129,11 @@ class Application(object):
             help='Mock config used if builder is mock',
         )
         parser.add_argument(
-            '-c', '--copr-repo',
+            '-C', '--copr-repo',
             help='Copr repo used if builder is copr',
         )
         parser.add_argument(
-            '-u', '--custom-file',
+            '-c', '--custom-file',
             help='Custom script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
