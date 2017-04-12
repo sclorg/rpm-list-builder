@@ -10,7 +10,7 @@ RECIPE_DIR="${TMP_DIR}/recipes"
 SOURCE_DIR="${TMP_DIR}/source_directory"
 WORK_DIR="${TMP_DIR}/work_directory"
 CUSTOM_DIR="${ROOT_DIR}/tests/fixtures/custom"
-CLI="sclrbh"
+CLI="rpmlb"
 RECIPE_ORG_FILE="${RECIPE_DIR}/ror.yml"
 RECIPE_ID="rh-ror50"
 RECEIPE_TEST_MIN_FILE="${RECIPE_DIR}/ror_test_min.yml"
@@ -64,7 +64,7 @@ before_test() {
 }
 
 make_test_dir() {
-    mktemp -d --suffix="-sclrbh"
+    mktemp -d --suffix="-rpmlb"
 }
 
 prepare_work_dir() {

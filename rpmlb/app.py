@@ -2,11 +2,11 @@ import argparse
 import logging
 import os
 
-import sclrbh
-from sclrbh.recipe import Recipe
-from sclrbh.builder.base import BaseBuilder
-from sclrbh.downloader.base import BaseDownloader
-from sclrbh.work import Work
+import rpmlb
+from rpmlb.recipe import Recipe
+from rpmlb.builder.base import BaseBuilder
+from rpmlb.downloader.base import BaseDownloader
+from rpmlb.work import Work
 
 LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
@@ -16,8 +16,8 @@ class Application(object):
     """An application class."""
 
     def __init__(self):
-        self._program = 'sclrbh'
-        self._version = sclrbh.__version__
+        self._program = 'rpmlb'
+        self._version = rpmlb.__version__
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)
@@ -39,7 +39,7 @@ class Application(object):
             args = self.parse_argv(argv)
 
             # Load recipe
-            recipe = Recipe(args.recipe_file, args.scl_id)
+            recipe = Recipe(args.recipe_file, args.recipe_id)
 
             args_dict = vars(args)
             work = Work(recipe, **args_dict)
@@ -73,7 +73,7 @@ class Application(object):
             help='Recipe file like yml file in {0}'.format(RECIPE_URL)
         )
         parser.add_argument(
-            'scl_id',
+            'recipe_id',
             help='ID in a recipe file. such as "python33", "rh-ror50"'
         )
         # General options
@@ -106,7 +106,7 @@ class Application(object):
         # Downloader options
         parser.add_argument(
             '-b', '--branch',
-            help='Git branch used in SCL package if downloader is rhpkg.',
+            help='Git branch used in a package if downloader is rhpkg.',
         )
         current_dir = os.getcwd()
         help_message = (

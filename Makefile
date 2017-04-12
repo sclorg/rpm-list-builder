@@ -15,7 +15,7 @@ install:
 .PHONY: install
 
 uninstall:
-	$(PIP) uninstall sclrbh
+	$(PIP) uninstall rpmlb
 .PHONY: uninstall
 
 # It takes about 7 mins.
@@ -59,6 +59,10 @@ venv-integration-test:
 	tests/integration/run.sh; \
 	deactivate
 .PHONY: venv-test-integration
+
+tox-notest:
+	tox --notest
+.PHONY: tox-notest
 
 tox:
 	tox

@@ -5,12 +5,19 @@ About the example, you can refer an integration test script [tests/integration/r
 
 ## Architecture
 
-This application is to to help rebuild packages.
+The application is to help building a list of RPM packages.
 
 And it is structured from several parts that are "Main application", "Recipe", "Download", "Build", "Work directory".
 
-"Main application" is directer program.
-That gets "Recipe" data from recipe file.
+"Main" is a main application that will get "Recipe" data from recipe file for a defined list of the RPM packages and download and build them.
+
+"Download" is how to get a list of building RPM packages.
+
+"Build" is how to build the list of the RPM packages.
+
+"Main" will order "Download" and "Build".
+
+"Work directory" will manage working directory strucure. See below section for detail.
 
 
 ### Structured factors
@@ -136,11 +143,11 @@ work_directory/
 
 1. First of all, run below command to see the command help.
 
-        $ sclrbh -h
+        $ rpmlb -h
 
-2. Below is `sclrbh`'s basic form. You have to set proper download type, build type, recipe file, reicpe ID. If you omit `--download`, `--build`, the default values are used. You can also use short option name too. See the command help for more detail.
+2. Below is `rpmlb`'s basic form. You have to set proper download type, build type, recipe file, reicpe ID. If you omit `--download`, `--build`, the default values are used. You can also use short option name too. See the command help for more detail.
 
-        $ sclrbh \
+        $ rpmlb \
           --download DOWNLOAD_TYPE \
           --build BUILD_TYPE \
           RECIPE_FILE \
@@ -152,7 +159,7 @@ work_directory/
 
 1. If you have not registered your pacakges to the respository yet, you may want to build from your pacakges on SOURCE_DIRECTORY in local environment. In the case, run
 
-        $ sclrbh \
+        $ rpmlb \
           --download local \
           --source-directory SOURCE_DIRECTORY \
           ...
@@ -163,7 +170,7 @@ work_directory/
 
 1. If you have registered your packages to the repository, you may want to build from the packages in repository. In the case, run with `--branch`.
 
-        $ sclrbh \
+        $ rpmlb \
           --download rhpkg \
           --branch BRANCH \
           ...
@@ -174,7 +181,7 @@ work_directory/
 
 1. You may want to customize your download way. In case, you can run with `--custom-file`.
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --download custom \
           --custom-file CUSTOM_FILE \
@@ -191,9 +198,9 @@ work_directory/
 
 ### Specify work directory
 
-1. As a default behavior of the application creates work directory to `/tmp/sclrbh-XXXXXXXX`. However you want to specifiy the directory, run with `--work-directory`.
+1. As a default behavior of the application creates work directory to `/tmp/rpmlb-XXXXXXXX`. However you want to specifiy the directory, run with `--work-directory`.
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --work-directory WORK_DIRECTORY \
           ...
@@ -206,7 +213,7 @@ work_directory/
 
 1. If you wan to build with mock, run with `--mock-config` (it is same with `mock -r`).
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --build mock \
           --mock-config MOCK_CONFIG \
@@ -221,11 +228,11 @@ work_directory/
 
 2. If you want to delete pacakages in the copr, run
 
-        $ scripts/delete_copr_pkgs COPR_REPO
+        $ scripts/delete_copr_pkgs.sh COPR_REPO
 
 3. To build for Copr, enter
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --build copr \
           --copr-repo COPR_REPO \
@@ -237,7 +244,7 @@ work_directory/
 
 1. You may want to customize your build way. In case, you can run with `--custom-file`.
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --build custom \
           --custom-file CUSTOM_FILE \
@@ -254,7 +261,7 @@ work_directory/
 
 1. If you don't want to build, only want to download the pacakges to create work directory. and later want to build only. In case, run **without** `--build` or with `--build dummy`. Then you can see the log for the dummy build. This is good to check your recipe file.
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --build dummy \
           ...
@@ -266,7 +273,7 @@ work_directory/
 
 1. If your build was failed during the process due to some reasons, you want to resume your build. In case run with `--work-directory` and  `--resume` **without** `--download`. The resume number is same with the number directory name in work directory. zero padding is ignored. That is ex. 01 => 1, 012 => 12.
 
-        $ sclrbh \
+        $ rpmlb \
           ...
           --build something \
           --work-directory WORK_DIRECTORY \

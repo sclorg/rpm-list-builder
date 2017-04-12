@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from sclrbh.downloader.local import LocalDownloader
+from rpmlb.downloader.local import LocalDownloader
 import helper
 
 
@@ -14,7 +14,7 @@ def test_download():
     downloader = LocalDownloader()
     package_dict = {'name': 'a'}
     # Create source files for test.
-    src_dir = tempfile.mkdtemp(prefix='sclrbh-test-src-')
+    src_dir = tempfile.mkdtemp(prefix='rpmlb-test-src-')
     with helper.pushd(src_dir):
         os.makedirs('a')
         helper.touch(os.path.join('a', 'a.spec'))

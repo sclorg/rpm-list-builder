@@ -1,6 +1,5 @@
 ## Feature
 - Show options specified by user in log file at first of running. [high]
-- Custom download [high]
 - Improve logging, --debug (-d) option.
   Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Split internal logic "rhpkg" to publish the tool on github.
@@ -13,15 +12,6 @@
 
 ## Refactoring
 
-- Change project/repository name [high]
-  from "scl-rebuild-helper2" to new one without using "scl",
-  such as "rpm-rebuild_helper"
-  A range of the tool responsibility is not only building SCL, but also
-  "building continual packages by recipe file"
-  Replace "scl" keyword to another word.
-- Improve exception info during the build. [high]
-  Add package, num_name, application directory to the exception.
-  => Maybe fixed.
 - Add Copr build to integration.
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.
@@ -36,7 +26,7 @@
     => make flask8
     => make test-style-bash
       for bash_file in bash_files:
-         check with "sh -c"
+         check with "sh -n"
          check with "bashate"
          check with "shellcheck"
 - Check other TODOs

@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from sclrbh import utils
+from rpmlb import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Work(object):
             if not os.path.exists(working_dir):
                 os.makedirs(working_dir)
         else:
-            working_dir = tempfile.mkdtemp(prefix='sclrbh-')
+            working_dir = tempfile.mkdtemp(prefix='rpmlb-')
         LOG.info('Working directory: %s', working_dir)
         self._working_dir = working_dir
 
@@ -56,11 +56,9 @@ class Work(object):
                 yield package_dict, num_name
 
             count += 1
-        return True
 
     def each_package_dir(self):
         for package_dict, num_name in self.each_num_dir():
             package = package_dict['name']
             with utils.pushd(package):
                 yield package_dict, num_name
-        return True

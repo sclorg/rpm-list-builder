@@ -1,6 +1,6 @@
 import logging
 
-from sclrbh.downloader.base import BaseDownloader
+from rpmlb.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 

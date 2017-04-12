@@ -1,6 +1,6 @@
 import os
 
-from sclrbh.app import Application
+from rpmlb.app import Application
 
 
 def test_init():
@@ -13,7 +13,7 @@ def test_parse_argv_no_options():
     args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50'])
     assert args
     assert args.recipe_file == '/tmp/ror.yml'
-    assert args.scl_id == 'rh-ror50'
+    assert args.recipe_id == 'rh-ror50'
     assert args.build == 'dummy'
     assert args.download == 'none'
     assert args.branch is None

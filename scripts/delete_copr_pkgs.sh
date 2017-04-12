@@ -1,13 +1,13 @@
 #!/bin/bash -x
 
-function show_usage {
+show_usage() {
     CMD=$(basename "${0}")
     cat <<EOF
 Usage: ${CMD} COPR_REPO
 EOF
 }
 
-function quit_program {
+quit_program() {
     echo "You pressed Ctrl-C. Quit the program."
     exit 1
 }
@@ -24,7 +24,7 @@ fi
 COPR_REPO="${1}"
 COPR_CLI='copr-cli'
 
-PKG_NAMES="$("${COPR_CLI}" list-package-names ${COPR_REPO})"
+PKG_NAMES="$("${COPR_CLI}" list-package-names "${COPR_REPO}")"
 
 for PKG_NAME in ${PKG_NAMES}; do
     "${COPR_CLI}" delete-package --name "${PKG_NAME}" "${COPR_REPO}"

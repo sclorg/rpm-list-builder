@@ -1,6 +1,11 @@
-from unittest.mock import MagicMock
+import sys
 
-from sclrbh.downloader.base import BaseDownloader
+from rpmlb.downloader.base import BaseDownloader
+
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 def test_init():
@@ -10,8 +15,8 @@ def test_init():
 
 def test_run():
     downloader = BaseDownloader()
-    downloader.download = MagicMock(return_value=True)
-    mock_work = MagicMock()
+    downloader.download = mock.MagicMock(return_value=True)
+    mock_work = mock.MagicMock()
     package_dicts = [
         {'name': 'a'},
         {'name': 'b'},

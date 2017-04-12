@@ -1,8 +1,10 @@
-from unittest.mock import MagicMock
-from unittest.mock import Mock
-from unittest.mock import call
+import sys
+from rpmlb.builder.base import BaseBuilder
 
-from sclrbh.builder.base import BaseBuilder
+if sys.version_info[0] >= 3:
+    from unittest import mock
+else:
+    import mock
 
 
 def test_init():
@@ -12,9 +14,9 @@ def test_init():
 
 def test_run():
     builder = BaseBuilder()
-    builder.build = MagicMock(return_value=True)
+    builder.build = mock.MagicMock(return_value=True)
 
-    mock_work = MagicMock()
+    mock_work = mock.MagicMock()
     package_dicts = [
         {'name': 'a'},
         {'name': 'b'},
@@ -32,9 +34,9 @@ def test_run():
 
 def test_run_exception():
     builder = BaseBuilder()
-    builder.build = Mock(side_effect=ValueError('test'))
+    builder.build = mock.Mock(side_effect=ValueError('test'))
 
-    mock_work = MagicMock()
+    mock_work = mock.MagicMock()
     package_dicts = [
         {'name': 'a'},
         {'name': 'b'},
@@ -55,11 +57,12 @@ def test_run_exception():
         error_message = str(e)
     assert called
     assert error_message == "pacakge_dict: {'name': 'a'}, num: 1"
-    builder.build.assert_called()
+    if sys.version_info >= (3, 6):
+        builder.build.assert_called()
     # bulid should be called 3 times for retry setting.
     calls = [
-        call({'name': 'a'}),
-        call({'name': 'a'}),
-        call({'name': 'a'}),
+        mock.call({'name': 'a'}),
+        mock.call({'name': 'a'}),
+        mock.call({'name': 'a'}),
     ]
     builder.build.assert_has_calls(calls)

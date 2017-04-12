@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import logging
 import os
 import subprocess
+import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -69,14 +70,37 @@ def run_cmd(cmd, **kwargs):
         stdout, stderr = proc.communicate()
         returncode = proc.returncode
         if check and returncode != 0:
-            LOG.error('CMD: %s', cmd)
+            LOG.error('CMD: [%s] failed at [%s]', cmd, os.getcwd())
             LOG.error('Return Code: %s', returncode)
-            LOG.error('Stdout: %s', stdout)
-            LOG.error('Stderr: %s', stderr)
+            if stdout is not None:
+                LOG.error('Stdout: %s', stdout)
+            if stderr is not None:
+                LOG.error('Stderr: %s', stderr)
+
+            kwargs_dict = {}
+            kwargs_dict['output'] = stdout
+            if sys.version_info >= (3, 5):
+                kwargs_dict['stderr'] = stderr
             raise subprocess.CalledProcessError(
-                returncode, cmd, stdout, stderr
+                returncode, cmd, **kwargs_dict
             )
-        return subprocess.CompletedProcess(cmd, returncode, stdout, stderr)
+        return CompletedProcess(cmd, returncode, stdout, stderr)
     except Exception as e:
-        proc.kill()
+        try:
+            proc.kill()
+        except:
+            pass
         raise e
+
+
+class CompletedProcess(object):
+    """A error class to manage the result of command
+    Use it instead of subprocess.CompletedProcess/CalledProcessError
+    for old Pytyons (<= 3.4).
+    """
+
+    def __init__(self, cmd, returncode, stdout, stderr):
+        self.cmd = cmd
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr

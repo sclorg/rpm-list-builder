@@ -1,13 +1,13 @@
 import logging
 
-from sclrbh.downloader.base import BaseDownloader
-from sclrbh.custom import Custom
+from rpmlb.builder.base import BaseBuilder
+from rpmlb.custom import Custom
 
 LOG = logging.getLogger(__name__)
 
 
-class CustomDownloader(BaseDownloader):
-    """A custom downloader class."""
+class CustomBuilder(BaseBuilder):
+    """A custom builder class."""
 
     def __init__(self):
         self._yaml_content = None
@@ -18,12 +18,12 @@ class CustomDownloader(BaseDownloader):
             raise ValueError('custom_file is required.')
 
         custom = Custom(custom_file)
-        custom.run_cmds('before_download')
+        custom.run_cmds('before_build')
 
-    def download(self, package_dict, **kwargs):
+    def build(self, package_dict, **kwargs):
         custom_file = kwargs['custom_file']
         if not custom_file:
             raise ValueError('custom_file is required.')
 
         custom = Custom(custom_file)
-        custom.run_cmds('download', **package_dict)
+        custom.run_cmds('build', **package_dict)

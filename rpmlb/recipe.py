@@ -1,6 +1,6 @@
 import logging
 
-from sclrbh.yaml import Yaml
+from rpmlb.yamlwrapper import Yaml
 
 LOG = logging.getLogger(__name__)
 
@@ -8,30 +8,30 @@ LOG = logging.getLogger(__name__)
 class Recipe(object):
     """A class to describe recipe data."""
 
-    def __init__(self, file_path, scl_id):
+    def __init__(self, file_path, recipe_id):
         if not file_path:
             raise ValueError('file_path is required.')
-        if not scl_id:
-            raise ValueError('scl_id is required.')
+        if not recipe_id:
+            raise ValueError('recipe_id is required.')
 
-        self._scl_id = scl_id
-        self._scl = None
+        self._recipe_id = recipe_id
+        self._recipe = None
 
         yaml = Yaml(file_path)
-        scl_dict = yaml.content
-        self._scl = scl_dict[scl_id]
-        self._num_of_package = len(self._scl['packages'])
+        recipe_dict = yaml.content
+        self._recipe = recipe_dict[recipe_id]
+        self._num_of_package = len(self._recipe['packages'])
 
     @property
-    def scl(self):
-        return self._scl
+    def recipe(self):
+        return self._recipe
 
     @property
     def num_of_package(self):
         return self._num_of_package
 
     def each_normalized_package(self):
-        packages = self._scl['packages']
+        packages = self._recipe['packages']
         for package in packages:
             package_dict = {}
             # String or hash
@@ -51,24 +51,24 @@ class Recipe(object):
             yield package_dict
 
     def verify(self):
-        scl = self._scl
+        recipe = self._recipe
 
-        if 'name' not in scl:
-            raise ValueError('name is required in the scl.')
-        if not scl['name']:
-            raise ValueError('name is invalid in the scl.')
+        if 'name' not in recipe:
+            raise ValueError('name is required in the recipe.')
+        if not recipe['name']:
+            raise ValueError('name is invalid in the recipe.')
 
-        if 'requires' in scl:
-            if not isinstance(scl['requires'], list):
+        if 'requires' in recipe:
+            if not isinstance(recipe['requires'], list):
                 raise ValueError('requires should be a list')
 
-        if 'packages' not in scl:
-            raise ValueError('packages is required in the scl.')
-        if not scl['packages']:
-            raise ValueError('packages is invalid in the scl.')
-        if not isinstance(scl['packages'], list):
+        if 'packages' not in recipe:
+            raise ValueError('packages is required in the recipe.')
+        if not recipe['packages']:
+            raise ValueError('packages is invalid in the recipe.')
+        if not isinstance(recipe['packages'], list):
             raise ValueError('packages should be a list.')
-        if len(scl['packages']) <= 0:
+        if len(recipe['packages']) <= 0:
             raise ValueError('packages should have a element > 0')
         for package_dict in self.each_normalized_package():
             assert(package_dict['name'])
