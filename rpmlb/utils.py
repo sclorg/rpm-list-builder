@@ -33,7 +33,13 @@ def get_instance(class_name, *args, **kwargs):
 def pushd(new_dir):
     previous_dir = os.getcwd()
     try:
-        os.chdir(new_dir)
+        new_ab_dir = None
+        if not os.path.isabs(new_dir):
+            new_ab_dir = os.path.join(previous_dir, new_dir)
+        else:
+            new_ab_dir = new_dir
+        # Use absolute path to show it on FileNotFoundError message.
+        os.chdir(new_ab_dir)
         yield
     finally:
         os.chdir(previous_dir)

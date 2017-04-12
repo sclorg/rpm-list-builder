@@ -1,0 +1,19 @@
+before_build:
+  - |
+    PKG_NAMES="$(copr-cli --config ${HOME}/.config/copr-internal \
+        list-package-names rh-ror50-test)"
+    for PKG_NAME in ${PKG_NAMES}; do
+        copr-cli --config ${HOME}/.config/copr-internal \
+            delete-package --name "${PKG_NAME}" rh-ror50-test
+    done
+build:
+  - |
+    if [ "${PKG}" = "rh-ror50" ]; then
+        sed -i 's/rh-ruby24/rh-ruby23/g' rh-ror50.spec
+        sed -i 's/rh-nodejs6/rh-nodejs4/g' rh-ror50.spec
+        sed -i 's/rh-mongodb32/rh-mongodb26/g' rh-ror50.spec
+    fi
+  - "rm -v *.rpm || true"
+  - rhpkg --dist rhscl-2.4-rh-ror50-rhel-7 srpm
+  - |
+    copr-cli --config ${HOME}/.config/copr-internal build rh-ror50-test *.rpm
