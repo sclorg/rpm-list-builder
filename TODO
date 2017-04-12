@@ -4,7 +4,6 @@
   Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
-- Support Ruby 2.7, 3.4, 3.5
 
 ## Bug
 
@@ -13,9 +12,6 @@
 
 ## Refactoring
 
-- Improve exception info during the build. [high]
-  Add package, num_name, application directory to the exception.
-  => Maybe fixed.
 - Add Copr build to integration.
 - Add documentation with Sphinx.
 - Rewrite the integration test with Python.
