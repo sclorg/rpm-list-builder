@@ -152,7 +152,7 @@ build_only_with_mock_test() {
     "${CLI}" \
         --build mock \
         --work-directory "${WORK_DIR}" \
-        -M "${MOCK_CONFIG}" \
+        --mock-config "${MOCK_CONFIG}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
     return "${?}"
