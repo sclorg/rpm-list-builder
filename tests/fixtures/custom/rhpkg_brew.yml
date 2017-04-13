@@ -1,0 +1,9 @@
+download:
+  - |
+    rhpkg co "${PKG}"
+build:
+  - |
+    rm -v *.rpm || true
+  - rhpkg srpm
+  - |
+    brew build --scratch
