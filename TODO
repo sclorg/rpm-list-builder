@@ -1,4 +1,5 @@
 ## Feature
+
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
 
@@ -20,13 +21,5 @@
   - downloader directory => downloaders.py
   - builders directory => builders.py
 - Run the integration test from tox.
-- Add shell code style task to Makefile for "sh -n", "bashate", "shellcheck".
-  make test-style
-    => make flask8
-    => make test-style-bash
-      for bash_file in bash_files:
-         check with "sh -n"
-         check with "bashate"
-         check with "shellcheck"
 - Check other TODOs
   $ grep -r TODO .
