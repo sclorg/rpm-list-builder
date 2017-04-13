@@ -1,6 +1,4 @@
 ## Feature
-- Improve logging, --debug (-d) option.
-  Ref: http://docs.python-guide.org/en/latest/writing/logging/
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
 
