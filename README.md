@@ -27,6 +27,20 @@ rpmlb ...
 
 ## Install
 
+### Download
+
+Download files from the git repository.
+
+    $ git clone REPO_URL
+
+Check release tags.
+
+    $ git tag
+
+Check out to release version.
+
+    $ git checkout vX.Y.Z
+
 ### Install to virtualenv environment
 
 You probably want to set up application on `virtualenv`.
