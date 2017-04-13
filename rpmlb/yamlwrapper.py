@@ -1,4 +1,5 @@
 import logging
+import os
 import yaml
 
 LOG = logging.getLogger(__name__)
@@ -12,8 +13,12 @@ class Yaml(object):
             from yaml import CLoader as Loader
         except ImportError:
             from yaml import Loader
-        with open(file_path, 'r') as stream:
-            self.content = yaml.load(stream, Loader=Loader)
+        try:
+            with open(file_path, 'r') as stream:
+                self.content = yaml.load(stream, Loader=Loader)
+        except FileNotFoundError as e:
+            LOG.error('File not found: %s at %s', file_path, os.getcwd())
+            raise e
 
     def dump(self):
         try:

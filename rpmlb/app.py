@@ -77,6 +77,11 @@ class Application(object):
             help='ID in a recipe file. such as "python33", "rh-ror50"'
         )
         # General options
+        parser.add_argument(
+            '-v', '--verbose',
+            action='store_true',
+            help='Print more log information about what is happening in.',
+        )
         help_message = (
             'Set download type. '
             'Value: {local, rhpkg, none, custom}. Default: none'
@@ -137,4 +142,39 @@ class Application(object):
             help='Custom script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
-        return parsed_args
+
+        # Set the voerbosity for the logging ASAP
+        # after getting verbose.
+        rpmlb.configure_logging(parsed_args.verbose)
+
+        normalized_args = self._normalize_args(parsed_args)
+        return normalized_args
+
+    def _normalize_args(self, args):
+        args_dict = vars(args)
+        normalized_args_dict = self._convert_args_as_abs_path(args_dict)
+        for key, value in sorted(normalized_args_dict.items()):
+            LOG.debug('Argument key: [%s], value: [%s]', key, value)
+
+        return Namespace(**normalized_args_dict)
+
+    def _convert_args_as_abs_path(self, args_dict):
+        path_type_options = [
+            'work_directory',
+            'source_directory',
+            'custom_file',
+        ]
+        user_current_dir = os.getcwd()
+        for key in path_type_options:
+            path = args_dict[key]
+            # If path type arguments are not absolute path,
+            # update them as abolute path to use them correctly
+            # in the program.
+            if path and not os.path.isabs(path):
+                args_dict[key] = os.path.join(user_current_dir, path)
+        return args_dict
+
+
+class Namespace:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)

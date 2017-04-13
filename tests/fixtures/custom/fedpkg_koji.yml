@@ -1,0 +1,9 @@
+download:
+  - |
+    fedpkg co "${PKG}"
+build:
+  - |
+    rm -v *.rpm || true
+  - fedpkg srpm
+  - |
+    koji build --scratch

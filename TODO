@@ -1,14 +1,14 @@
 ## Feature
-- Show options specified by user in log file at first of running. [high]
-- Improve logging, --debug (-d) option.
-  Ref: http://docs.python-guide.org/en/latest/writing/logging/
+
 - Split internal logic "rhpkg" to publish the tool on github.
 - Create Copr repo from script by a recipe file's requires, install information.
 
 ## Bug
 
 - retry feature does not work.
-  => Maybe fixed.
+  => Maybe fixed. But will add log message for that. Retry 1, 2, 3..
+- Stop program immediately after getting SIGINT (Ctrl+C) from user.
+  without retrying.
 
 ## Refactoring
 
@@ -21,13 +21,5 @@
   - downloader directory => downloaders.py
   - builders directory => builders.py
 - Run the integration test from tox.
-- Add shell code style task to Makefile for "sh -n", "bashate", "shellcheck".
-  make test-style
-    => make flask8
-    => make test-style-bash
-      for bash_file in bash_files:
-         check with "sh -n"
-         check with "bashate"
-         check with "shellcheck"
 - Check other TODOs
   $ grep -r TODO .
