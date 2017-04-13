@@ -34,6 +34,7 @@ class BaseDownloader(object):
             instance = CustomDownloader()
         else:
             raise ValueError('name is invalid.')
+        LOG.debug('Loaded downloader with %s', name)
         return instance
 
     def run(self, work, **kwargs):

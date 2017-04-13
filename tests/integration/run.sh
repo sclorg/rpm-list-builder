@@ -131,10 +131,11 @@ download_with_custom_and_build_with_dummy_test() {
     return "${?}"
 }
 
-build_only_test() {
+build_only_verbose_test() {
     prepare_work_dir
 
     "${CLI}" \
+        --verbose \
         --work-directory "${WORK_DIR}" \
         "${RECEIPE_TEST_MIN_FILE}" \
         "${RECIPE_ID}"
@@ -164,6 +165,7 @@ build_only_with_custom_echo_test() {
     prepare_work_dir
 
     "${CLI}" \
+        --verbose \
         --build custom \
         --work-directory "${WORK_DIR}" \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
@@ -231,7 +233,7 @@ run_test() {
         download_from_local_and_build_with_dummy_test
         download_by_rhpkg_and_build_with_dummy_test
         download_with_custom_and_build_with_dummy_test
-        build_only_test
+        build_only_verbose_test
         # The test takes long time
         build_only_with_mock_test
         build_only_with_custom_echo_test

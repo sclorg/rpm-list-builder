@@ -18,6 +18,7 @@ class Recipe(object):
         self._recipe = None
 
         yaml = Yaml(file_path)
+        LOG.debug('Loaded recipe: %s', file_path)
         recipe_dict = yaml.content
         self._recipe = recipe_dict[recipe_id]
         self._num_of_package = len(self._recipe['packages'])

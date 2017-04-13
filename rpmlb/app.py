@@ -77,6 +77,11 @@ class Application(object):
             help='ID in a recipe file. such as "python33", "rh-ror50"'
         )
         # General options
+        parser.add_argument(
+            '-v', '--verbose',
+            action='store_true',
+            help='Print more log information about what is happening in.',
+        )
         help_message = (
             'Set download type. '
             'Value: {local, rhpkg, none, custom}. Default: none'
@@ -137,6 +142,11 @@ class Application(object):
             help='Custom script file used if builder is custom',
         )
         parsed_args = parser.parse_args(args)
+
+        # Set the voerbosity for the logging ASAP
+        # after getting verbose.
+        rpmlb.configure_logging(parsed_args.verbose)
+
         normalized_args = self._normalize_args(parsed_args)
         return normalized_args
 
@@ -160,7 +170,7 @@ class Application(object):
             # If path type arguments are not absolute path,
             # update them as abolute path to use them correctly
             # in the program.
-            if not os.path.isabs(path):
+            if path and not os.path.isabs(path):
                 args_dict[key] = os.path.join(user_current_dir, path)
         return args_dict
 

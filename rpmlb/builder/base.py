@@ -39,6 +39,7 @@ class BaseBuilder(object):
             instance = DummyBuilder()
         else:
             raise ValueError('name is invalid.')
+        LOG.debug('Loaded builder with %s', name)
         return instance
 
     def run(self, work, **kwargs):
