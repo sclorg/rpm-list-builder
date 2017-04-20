@@ -66,6 +66,18 @@ Otherwise run appplication to install the application directly.
 
     $ pip3 install .
 
+For example for installed python 3.6.1.
+
+    $ sudo /usr/local/python-3.6.1/bin/pip3 install .
+
+    $ pip3 list | grep rpmlb
+    rpmlb         1.0.0
+
+    $ which rpmlb
+    /usr/local/python-3.6.1/bin/rpmlb
+
+    $ rpmlb -h
+
 ## Usage
 
 See [Users Guide](docs/users_guide.md).
