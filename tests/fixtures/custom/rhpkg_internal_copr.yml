@@ -1,3 +1,8 @@
+download:
+  - |
+    rhpkg co "${PKG}"
+    cd "${PKG}"
+    git checkout rhscl-2.4-rh-ror50-rhel-7
 before_build:
   - |
     PKG_NAMES="$(copr-cli --config ${HOME}/.config/copr-internal \
