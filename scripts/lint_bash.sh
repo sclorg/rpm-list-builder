@@ -18,7 +18,7 @@ FILES="$(find "${ROOT_DIR}/scripts" "${ROOT_DIR}/tests" -name "*.sh")"
 STATUS=0
 
 for FILE in ${FILES}; do
-    if ! sh -n "${FILE}"; then
+    if ! bash -n "${FILE}"; then
         STATUS=1
         echo "${FILE}: NG at sh -n"
         continue
