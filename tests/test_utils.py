@@ -53,5 +53,4 @@ def test_run_cmd_exception():
     assert result_e.output == b''
     if sys.version_info >= (3, 5):
         assert result_e.stdout == b''
-        assert result_e.stderr == \
-            b'ls: cannot access \'abc\': No such file or directory\n'
+        assert b'No such file or directory' in result_e.stderr

@@ -65,12 +65,12 @@ def run_cmd(cmd, **kwargs):
         kwargs['shell'] = True
 
         LOG.debug('CMD: %s, kwargs: %s', cmd, repr(kwargs))
+
+        env = os.environ.copy()
+        env['LC_ALL'] = 'C.utf-8'  # better to parse English output
         if 'env' in kwargs:
-            # Keep current environment variables
-            env = os.environ
-            for key, value in list(kwargs['env'].items()):
-                env[key] = value
-            kwargs['env'] = env
+            env.update(kwargs['env'])
+        kwargs['env'] = env
 
         proc = subprocess.Popen(cmd, **kwargs)
         stdout, stderr = proc.communicate()
