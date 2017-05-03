@@ -6,7 +6,7 @@ from rpmlb.yamlwrapper import Yaml
 LOG = logging.getLogger(__name__)
 
 
-class Custom(object):
+class Custom:
     """A class to manage custom file."""
 
     def __init__(self, file_path):

@@ -99,7 +99,7 @@ def run_cmd(cmd, **kwargs):
         raise e
 
 
-class CompletedProcess(object):
+class CompletedProcess:
     """A error class to manage the result of command
     Use it instead of subprocess.CompletedProcess/CalledProcessError
     for old Pytyons (<= 3.4).

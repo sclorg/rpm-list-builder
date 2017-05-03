@@ -5,7 +5,7 @@ from rpmlb.yamlwrapper import Yaml
 LOG = logging.getLogger(__name__)
 
 
-class Recipe(object):
+class Recipe:
     """A class to describe recipe data."""
 
     def __init__(self, file_path, recipe_id):

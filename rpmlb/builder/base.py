@@ -10,7 +10,7 @@ import retrying
 LOG = logging.getLogger(__name__)
 
 
-class BaseBuilder(object):
+class BaseBuilder:
     """A base class for the package builder."""
 
     def __init__(self):
@@ -63,9 +63,8 @@ class BaseBuilder(object):
                 message = 'pacakge_dict: {0}, num: {1}, work_dir: {2}'.format(
                     package_dict, num_name, work.working_dir)
                 error = RuntimeError(message)
-                if sys.version_info[0] >= 3:
-                    tb = sys.exc_info()[2]
-                    error = error.with_traceback(tb)
+                tb = sys.exc_info()[2]
+                error = error.with_traceback(tb)
                 raise error
 
         self.after(work, **kwargs)

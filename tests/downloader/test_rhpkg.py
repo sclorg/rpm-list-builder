@@ -1,11 +1,6 @@
-import sys
+from unittest import mock
 
 from rpmlb.downloader.rhpkg import RhpkgDownloader
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
 
 
 def test_init():

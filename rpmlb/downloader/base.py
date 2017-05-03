@@ -5,7 +5,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-class BaseDownloader(object):
+class BaseDownloader:
     """A base class for the package downloader."""
 
     def __init__(self):

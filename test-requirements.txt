@@ -1,6 +1,5 @@
 # Test
 pytest
-mock # for Python2
 # Code Analysis
 flake8
 flake8-colors

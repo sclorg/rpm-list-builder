@@ -5,7 +5,7 @@ import yaml
 LOG = logging.getLogger(__name__)
 
 
-class Yaml(object):
+class Yaml:
     """A class to manage YAML data."""
 
     def __init__(self, file_path):

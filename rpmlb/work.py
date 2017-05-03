@@ -8,7 +8,7 @@ from rpmlb import utils
 LOG = logging.getLogger(__name__)
 
 
-class Work(object):
+class Work:
     """A class to manage working directory."""
 
     def __init__(self, recipe, **kwargs):

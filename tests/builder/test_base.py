@@ -1,10 +1,7 @@
 import sys
-from rpmlb.builder.base import BaseBuilder
+from unittest import mock
 
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
+from rpmlb.builder.base import BaseBuilder
 
 
 def test_init():

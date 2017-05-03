@@ -12,7 +12,7 @@ LOG = logging.getLogger(__name__)
 RECIPE_URL = 'https://github.com/sclorg/rhscl-rebuild-recipes'
 
 
-class Application(object):
+class Application:
     """An application class."""
 
     def __init__(self):

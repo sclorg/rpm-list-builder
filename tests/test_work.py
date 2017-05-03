@@ -1,17 +1,12 @@
 import os
 import re
 import shutil
-import sys
 import tempfile
+from unittest import mock
 
 from rpmlb.work import Work
 
 import helper
-
-if sys.version_info[0] >= 3:
-    from unittest import mock
-else:
-    import mock
 
 
 def test_init():
