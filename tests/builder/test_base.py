@@ -9,41 +9,32 @@ def test_init():
     assert builder
 
 
-def test_run():
+def test_run_calls_before_build_after():
     builder = BaseBuilder()
+    builder.before = mock.MagicMock()
     builder.build = mock.MagicMock(return_value=True)
+    builder.after = mock.MagicMock()
 
-    mock_work = mock.MagicMock()
-    package_dicts = [
-        {'name': 'a'},
-        {'name': 'b'},
-    ]
-    num_names = [
-        '1',
-        '2',
-    ]
-    mock_work.each_package_dir.return_value = iter(
-        zip(package_dicts, num_names))
+    mock_work = get_mock_work()
+    builder.run(mock_work)
+    assert builder.before.called
+    assert builder.build.called
+    assert builder.after.called
 
-    result = builder.run(mock_work)
-    assert result
+
+def test_run_returns_true_on_success():
+    builder = BaseBuilder()
+    builder.build = lambda *args, **kwargs: None
+
+    mock_work = get_mock_work()
+    assert builder.run(mock_work)
 
 
 def test_run_exception():
     builder = BaseBuilder()
     builder.build = mock.Mock(side_effect=ValueError('test'))
 
-    mock_work = mock.MagicMock()
-    package_dicts = [
-        {'name': 'a'},
-        {'name': 'b'},
-    ]
-    num_names = [
-        '1',
-        '2',
-    ]
-    mock_work.each_package_dir.return_value = iter(
-        zip(package_dicts, num_names))
+    mock_work = get_mock_work()
     type(mock_work).working_dir = mock.PropertyMock(return_value='work_dir')
 
     called = False
@@ -68,3 +59,31 @@ def test_run_exception():
         mock.call({'name': 'a'}),
     ]
     builder.build.assert_has_calls(calls)
+
+
+def test_run_does_not_call_before_calls_build_after_with_resume_option():
+    builder = BaseBuilder()
+    builder.before = mock.MagicMock()
+    builder.build = mock.MagicMock(return_value=True)
+    builder.after = mock.MagicMock()
+
+    mock_work = get_mock_work()
+    builder.run(mock_work, resume=2)
+    assert not builder.before.called
+    assert builder.build.called
+    assert builder.after.called
+
+
+def get_mock_work():
+    mock_work = mock.MagicMock()
+    package_dicts = [
+        {'name': 'a'},
+        {'name': 'b'},
+    ]
+    num_names = [
+        '1',
+        '2',
+    ]
+    mock_work.each_package_dir.return_value = iter(
+        zip(package_dicts, num_names))
+    return mock_work

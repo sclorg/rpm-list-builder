@@ -32,6 +32,15 @@ class BaseDownloader:
         return instance
 
     def run(self, work, **kwargs):
+        is_resume = kwargs.get('resume', False)
+        if is_resume:
+            message = (
+                'Skip the download process, '
+                'because the resume option was used.'
+            )
+            LOG.info(message)
+            return True
+
         self.before(work, **kwargs)
 
         for package_dict, num_name in work.each_num_dir():

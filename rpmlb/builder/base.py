@@ -37,12 +37,19 @@ class BaseBuilder:
         return instance
 
     def run(self, work, **kwargs):
-        self.before(work, **kwargs)
-
-        is_resume = 'resume' in kwargs and kwargs['resume']
+        is_resume = kwargs.get('resume', False)
         resume_num = 0
         if is_resume:
             resume_num = kwargs['resume']
+
+        if is_resume:
+            message = (
+                'Skip the process before build, '
+                'because the resume option was used.'
+            )
+            LOG.info(message)
+        else:
+            self.before(work, **kwargs)
 
         for package_dict, num_name in work.each_package_dir():
             try:

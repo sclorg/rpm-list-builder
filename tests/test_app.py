@@ -32,46 +32,55 @@ def test_run_returns_false_on_exception():
     assert not app.run()
 
 
-def test_parse_argv_no_options():
+def test_parse_argv_without_option_returns_dict():
     app = Application()
-    args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50'])
-    assert args
-    assert args.recipe_file == '/tmp/ror.yml'
-    assert args.recipe_id == 'rh-ror50'
-    assert args.build == 'dummy'
-    assert args.download == 'none'
-    assert args.branch is None
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50'])
+    assert args_dict
+    assert args_dict['recipe_file'] == '/tmp/ror.yml'
+    assert args_dict['recipe_id'] == 'rh-ror50'
+    assert args_dict['build'] == 'dummy'
+    assert args_dict['download'] == 'none'
+    assert 'branch' not in args_dict
+    assert 'resume' not in args_dict
     current_dir = os.getcwd()
-    assert args.source_directory == current_dir
+    assert args_dict['source_directory'] == current_dir
 
 
-def test_parse_argv_build():
+def test_parse_argv_with_build_option_returns_dict():
     app = Application()
-    args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
-                           '--build', 'mock'])
-    assert args
-    assert args.build == 'mock'
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
+                                '--build', 'mock'])
+    assert args_dict
+    assert args_dict['build'] == 'mock'
 
 
-def test_parse_argv_download():
+def test_parse_argv_with_download_option_returns_dict():
     app = Application()
-    args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
-                           '--download', 'rhpkg'])
-    assert args
-    assert args.download == 'rhpkg'
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
+                                '--download', 'rhpkg'])
+    assert args_dict
+    assert args_dict['download'] == 'rhpkg'
 
 
-def test_parse_branch():
+def test_parse_argv_with_branch_option_returns_dict():
     app = Application()
-    args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
-                           '--branch', 'rhscl-2.3-rh-ror42-rhel-7'])
-    assert args
-    assert args.branch == 'rhscl-2.3-rh-ror42-rhel-7'
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
+                                '--branch', 'rhscl-2.3-rh-ror42-rhel-7'])
+    assert args_dict
+    assert args_dict['branch'] == 'rhscl-2.3-rh-ror42-rhel-7'
 
 
-def test_parse_source_directory():
+def test_parse_argv_with_source_directory_option_returns_dict():
     app = Application()
-    args = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
-                           '--source-directory', '/tmp/foo'])
-    assert args
-    assert args.source_directory == '/tmp/foo'
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
+                                '--source-directory', '/tmp/foo'])
+    assert args_dict
+    assert args_dict['source_directory'] == '/tmp/foo'
+
+
+def test_parse_argv_with_resume_option_returns_dict():
+    app = Application()
+    args_dict = app.parse_argv(['prog', '/tmp/ror.yml', 'rh-ror50',
+                                '--resume', '02'])
+    assert args_dict
+    assert args_dict['resume'] == 2
