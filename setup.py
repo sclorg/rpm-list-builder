@@ -9,7 +9,7 @@ setuptools.setup(
     description='Software Collection Rebuild Helper',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
-    url='https://gitlab.cee.redhat.com/jaruga/rhscl-builder',
+    url='https://github.com/sclorg/rpm-list-builder',
     packages=[
         'rpmlb',
         'rpmlb.builder',
