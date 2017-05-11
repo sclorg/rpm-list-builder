@@ -1,11 +1,14 @@
 """CLI interface for the package"""
 
 import os
-from pprint import pformat
 
 import click
 
-from . import configure_logging
+from . import LOG, configure_logging
+from .builder.base import BaseBuilder
+from .downloader.base import BaseDownloader
+from .recipe import Recipe
+from .work import Work
 
 
 @click.command()
@@ -74,7 +77,26 @@ from . import configure_logging
 def run(**option_dict):
     """Download and build RPMs listed in RECIPE under NAME (such as 'python33')."""
 
-    click.echo_via_pager(pformat(option_dict))
+    # Load recipe and processing objects
+    recipe = Recipe(option_dict['recipe'], option_dict['name'])
+    recipe.verify()
+
+    builder = BaseBuilder.get_instance(option_dict['build'])
+    downloader = BaseDownloader.get_instance(option_dict['download'])
+
+    # Prepare the working directory
+    # HINT: with contextlib.closing(Work(recipe, **option_dict)) as work:
+    work = Work(recipe, **option_dict)
+
+    # Download
+    LOG.info('Downloading...')
+    downloader.run(work, **option_dict)
+
+    # Build
+    LOG.info('Building...')
+    builder.run(work, **option_dict)
+
+    LOG.info('Success!')
 
 
 # Run the process on direct invocation
