@@ -5,12 +5,17 @@ from pprint import pformat
 
 import click
 
+from . import configure_logging
+
 
 @click.command()
 # General options
 @click.option(
     '--verbose', '-v', is_flag=True, default=False,
     help='Turn on verbose logging.',
+    # Enable logging as early as possible
+    is_eager=True, expose_value=False,
+    callback=lambda ctx, param, verbose: configure_logging(verbose),
 )
 @click.option(
     '--download', '-d',
