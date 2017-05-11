@@ -70,15 +70,15 @@ from .work import Work
 )
 # Positional arguments
 @click.argument(
-    'recipe',
+    'recipe_file',
     type=click.Path(exists=True, dir_okay=False, resolve_path=True),
 )
-@click.argument('name')
-def run(**option_dict):
-    """Download and build RPMs listed in RECIPE under NAME (such as 'python33')."""
+@click.argument('recipe_name')
+def run(recipe_file, recipe_name, **option_dict):
+    """Download and build RPMs listed in RECIPE_FILE under RECIPE_NAME (such as 'python33')."""
 
     # Load recipe and processing objects
-    recipe = Recipe(option_dict['recipe'], option_dict['name'])
+    recipe = Recipe(recipe_file, recipe_name)
     recipe.verify()
 
     builder = BaseBuilder.get_instance(option_dict['build'])
