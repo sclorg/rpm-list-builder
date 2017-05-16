@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import importlib
 import logging
 import os
 import subprocess
@@ -15,18 +16,36 @@ def camelize(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
 
-# Get Class object for class_name: foo.bar.Bar
-def get_class(class_name):
-    components = class_name.split('.')
-    module = __import__(components[0])
-    for comp in components[1:]:
-        module = getattr(module, comp)
-    return module
+def get_class(class_name: str, package: str = __package__):
+    """Dynamically import class from a module.
+
+    Keyword arguments:
+        class_name: The class/attribute name in standard import form.
+        package: Name of the package to import from (for relative imports).
+
+    Returns:
+        type: The requested class.
+    """
+
+    mod_name, class_name = class_name.rsplit(sep='.', maxsplit=1)
+    module = importlib.import_module(mod_name, package)
+    return getattr(module, class_name)
 
 
-def get_instance(class_name, *args, **kwargs):
+def get_instance(class_name: str, *args, **kwargs):
+    """Dynamically instantiate a class.
+
+    Keyword arguments:
+        class_name: Absolute or relative import name of the class.
+        *args: Positional arguments for the class __init__.
+        **kwargs: Keyword arguments for the class __init__.
+
+    Return:
+        Instance of the specified class.
+    """
+
     cls = get_class(class_name)
-    return cls(args, kwargs)
+    return cls(*args, **kwargs)
 
 
 @contextmanager

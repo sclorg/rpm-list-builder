@@ -1,6 +1,6 @@
 import logging
 
-# from rpmlb import utils
+from .. import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -11,29 +11,23 @@ class BaseDownloader:
     def __init__(self):
         pass
 
-    @classmethod
-    def get_instance(cls, name):
-        # TODO: Use reflection.
-        # class_name = 'rpmlb.downloader.{0}.{1}Downloader'.format(
-        #     name,
-        #     utils.camelize(name)
-        # )
-        # return utils.get_instance(class_name)
-        instance = None
-        if name == 'local':
-            from rpmlb.downloader.local import LocalDownloader
-            instance = LocalDownloader()
-        elif name == 'rhpkg':
-            from rpmlb.downloader.rhpkg import RhpkgDownloader
-            instance = RhpkgDownloader()
-        elif name == 'none':
-            from rpmlb.downloader.none import NoneDownloader
-            instance = NoneDownloader()
-        elif name == 'custom':
-            from rpmlb.downloader.custom import CustomDownloader
-            instance = CustomDownloader()
-        else:
-            raise ValueError('name is invalid.')
+    @staticmethod
+    def get_instance(name: str):
+        """Dynamically instantiate named downloader.
+
+        Keyword arguments:
+            name: Name of the requested builder.
+
+        Returns:
+            Instance of the requested builder.
+        """
+
+        class_name = 'rpmlb.downloader.{0}.{1}Downloader'.format(
+            name,
+            utils.camelize(name)
+        )
+        instance = utils.get_instance(class_name)
+
         LOG.debug('Loaded downloader with %s', name)
         return instance
 

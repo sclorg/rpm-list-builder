@@ -5,7 +5,7 @@ import sys
 
 import retrying
 
-# from rpmlb import utils
+from .. import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -16,29 +16,23 @@ class BaseBuilder:
     def __init__(self):
         pass
 
-    @classmethod
-    def get_instance(cls, name):
-        # TODO: Use reflection.
-        # class_name = 'rpmlb.builder.{0}.{1}Builder'.format(
-        #     name,
-        #     utils.camelize(name)
-        # )
-        # return utils.get_instance(class_name)
-        instance = None
-        if name == 'mock':
-            from rpmlb.builder.mock import MockBuilder
-            instance = MockBuilder()
-        elif name == 'copr':
-            from rpmlb.builder.copr import CoprBuilder
-            instance = CoprBuilder()
-        elif name == 'custom':
-            from rpmlb.builder.custom import CustomBuilder
-            instance = CustomBuilder()
-        elif name == 'dummy':
-            from rpmlb.builder.dummy import DummyBuilder
-            instance = DummyBuilder()
-        else:
-            raise ValueError('name is invalid.')
+    @staticmethod
+    def get_instance(name: str):
+        """Instantiate named builder.
+
+        Keyword arguments:
+            name: The name of the requested builder.
+
+        Returns:
+            Instance of the named builder.
+        """
+
+        class_name = 'rpmlb.builder.{0}.{1}Builder'.format(
+            name,
+            utils.camelize(name)
+        )
+        instance = utils.get_instance(class_name)
+
         LOG.debug('Loaded builder with %s', name)
         return instance
 
