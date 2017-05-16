@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 
 from rpmlb.app import Application
 
@@ -6,6 +7,29 @@ from rpmlb.app import Application
 def test_init():
     app = Application()
     assert app
+
+
+def test_run_calls_run_internally():
+    app = Application()
+    app.run_internally = mock.MagicMock(return_value=True)
+    app.run()
+    assert app.run_internally.called
+
+
+def test_run_returns_true_on_success():
+    app = Application()
+    app.run_internally = lambda *args: None
+    assert app.run()
+
+
+def test_run_returns_false_on_exception():
+    app = Application()
+
+    def run_internally(*args):
+        raise RuntimeError('test')
+
+    app.run_internally = run_internally
+    assert not app.run()
 
 
 def test_parse_argv_no_options():

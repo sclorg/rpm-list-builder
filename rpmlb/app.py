@@ -21,16 +21,19 @@ class Application:
 
     def run(self, argv=None):
         LOG.info("Starting %s (%s)", self._program, self._version)
-        is_error = False
+        is_success = False
         try:
             self.run_internally(argv)
+        except Exception as e:
+            LOG.exception(e)
         except KeyboardInterrupt as e:
             print('... stopped')
             LOG.error('Caught keyboard interrupt from user')
             LOG.exception(e)
-            is_error = True
+        else:
+            is_success = True
 
-        raise SystemExit(is_error)
+        return is_success
 
     def run_internally(self, argv):
         work = None
