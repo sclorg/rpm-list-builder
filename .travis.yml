@@ -20,7 +20,6 @@ cache:
   directories:
   - $HOME/.cache/pip
   - .eggs
-  - .tox
 
 install:
 - pip install tox-travis
