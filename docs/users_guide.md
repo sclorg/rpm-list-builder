@@ -271,11 +271,11 @@ work_directory/
 
 ### Resume from any position of pacakges
 
-1. If your build was failed during the process due to some reasons, you want to resume your build. In case run with `--work-directory` and  `--resume` **without** `--download`. The resume number is same with the number directory name in work directory. zero padding is ignored. That is ex. 01 => 1, 012 => 12.
+1. If your build was failed during the process due to some reasons, you want to resume your build. In case run with `--work-directory` and  `--resume`. The resume number is same with the number directory name in work directory. zero padding is ignored. That is ex. 01 => 1, 012 => 12.
 
         $ rpmlb \
           ...
-          --build something \
+          --build BUILD_TYPE \
           --work-directory WORK_DIRECTORY \
           --resume 35 \
           ...

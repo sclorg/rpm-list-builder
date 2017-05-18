@@ -39,17 +39,16 @@ class Application:
         work = None
 
         try:
-            args = self.parse_argv(argv)
+            args_dict = self.parse_argv(argv)
 
             # Load recipe
-            recipe = Recipe(args.recipe_file, args.recipe_id)
+            recipe = Recipe(args_dict['recipe_file'], args_dict['recipe_id'])
 
-            args_dict = vars(args)
             work = Work(recipe, **args_dict)
             # Load downloader
-            downloader = BaseDownloader.get_instance(args.download)
+            downloader = BaseDownloader.get_instance(args_dict['download'])
             # Load builder
-            builder = BaseBuilder.get_instance(args.build)
+            builder = BaseBuilder.get_instance(args_dict['build'])
 
             # Run downloader
             LOG.info('Downloading...')
@@ -150,16 +149,21 @@ class Application:
         # after getting verbose.
         rpmlb.configure_logging(parsed_args.verbose)
 
-        normalized_args = self._normalize_args(parsed_args)
-        return normalized_args
+        args_dict = self._normalize_args_to_dict(parsed_args)
+        return args_dict
 
-    def _normalize_args(self, args):
+    def _normalize_args_to_dict(self, args):
         args_dict = vars(args)
+        # Remove the element that has value: None from args_dict.
+        # Because the element is harmful.
+        args_dict = {
+            key: value for key, value in args_dict.items() if value is not None
+        }
         normalized_args_dict = self._convert_args_as_abs_path(args_dict)
         for key, value in sorted(normalized_args_dict.items()):
             LOG.debug('Argument key: [%s], value: [%s]', key, value)
 
-        return Namespace(**normalized_args_dict)
+        return normalized_args_dict
 
     def _convert_args_as_abs_path(self, args_dict):
         path_type_options = [
@@ -169,6 +173,8 @@ class Application:
         ]
         user_current_dir = os.getcwd()
         for key in path_type_options:
+            if key not in args_dict:
+                continue
             path = args_dict[key]
             # If path type arguments are not absolute path,
             # update them as abolute path to use them correctly
@@ -176,8 +182,3 @@ class Application:
             if path and not os.path.isabs(path):
                 args_dict[key] = os.path.join(user_current_dir, path)
         return args_dict
-
-
-class Namespace:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
