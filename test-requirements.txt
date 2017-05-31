@@ -7,5 +7,7 @@ flake8-colors
 # flake8-pep257
 # Code Formatter
 pyformat
+# Coverage
+pytest-cov
 # Documentation
 # Sphinx

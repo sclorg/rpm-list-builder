@@ -4,8 +4,10 @@
 *.swp
 *~
 .DS_Store
+/.coverage
 /build
 /dist
+/htmlcov
 /installed_files.txt
 /tmp
 /vendor
