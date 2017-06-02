@@ -15,24 +15,15 @@ class Recipe:
             raise ValueError('recipe_id is required.')
 
         self._recipe_id = recipe_id
-        self._recipe = None
 
         yaml = Yaml(file_path)
         LOG.debug('Loaded recipe: %s', file_path)
         recipe_dict = yaml.content
-        self._recipe = recipe_dict[recipe_id]
-        self._num_of_package = len(self._recipe['packages'])
-
-    @property
-    def recipe(self):
-        return self._recipe
-
-    @property
-    def num_of_package(self):
-        return self._num_of_package
+        self.recipe = recipe_dict[recipe_id]
+        self.num_of_package = len(self.recipe['packages'])
 
     def each_normalized_package(self):
-        packages = self._recipe['packages']
+        packages = self.recipe['packages']
         for package in packages:
             package_dict = {}
             # String or hash
@@ -52,7 +43,7 @@ class Recipe:
             yield package_dict
 
     def verify(self):
-        recipe = self._recipe
+        recipe = self.recipe
 
         if 'name' not in recipe:
             raise ValueError('name is required in the recipe.')
@@ -69,8 +60,6 @@ class Recipe:
             raise ValueError('packages is invalid in the recipe.')
         if not isinstance(recipe['packages'], list):
             raise ValueError('packages should be a list.')
-        if len(recipe['packages']) <= 0:
-            raise ValueError('packages should have a element > 0')
         for package_dict in self.each_normalized_package():
             assert(package_dict['name'])
 

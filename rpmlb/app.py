@@ -43,6 +43,8 @@ class Application:
 
             # Load recipe
             recipe = Recipe(args_dict['recipe_file'], args_dict['recipe_id'])
+            # Verify recipe data
+            recipe.verify()
 
             work = Work(recipe, **args_dict)
             # Load downloader
