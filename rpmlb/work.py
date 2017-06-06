@@ -27,28 +27,24 @@ class Work:
         else:
             working_dir = tempfile.mkdtemp(prefix='rpmlb-')
         LOG.info('Working directory: %s', working_dir)
-        self._working_dir = working_dir
-
-    @property
-    def working_dir(self):
-        return self._working_dir
+        self.working_dir = working_dir
 
     def close(self):
-        if os.path.isdir(self._working_dir):
-            shutil.rmtree(self._working_dir)
+        if os.path.isdir(self.working_dir):
+            shutil.rmtree(self.working_dir)
 
     def num_name_from_count(self, count):
         num_name = self._num_dir_format % count
         return num_name
 
     def each_num_dir(self):
-        if not os.path.isdir(self._working_dir):
+        if not os.path.isdir(self.working_dir):
             ValueError('working_dir does not exist.')
 
         count = 1
         for package_dict in self._recipe.each_normalized_package():
             num_name = self.num_name_from_count(count)
-            num_dir = os.path.join(self._working_dir, num_name)
+            num_dir = os.path.join(self.working_dir, num_name)
 
             if not os.path.isdir(num_dir):
                 os.makedirs(num_dir)
