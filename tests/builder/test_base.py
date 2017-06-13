@@ -1,7 +1,23 @@
 import sys
+from pathlib import Path
 from unittest import mock
 
+import pytest
+
 from rpmlb.builder.base import BaseBuilder
+
+
+@pytest.fixture
+def empty_spec_path(tmpdir):
+    """Empty spec file path"""
+
+    spec = Path(str(tmpdir), 'test.spec')
+    spec.touch()
+
+    yield spec
+
+    if spec.exists():
+        spec.unlink()
 
 
 def test_init():
@@ -87,3 +103,27 @@ def get_mock_work():
     mock_work.each_package_dir.return_value = iter(
         zip(package_dicts, num_names))
     return mock_work
+
+
+def test_double_edit(empty_spec_path):
+    """Original spec file is not modified twice"""
+
+    def edit_file(builder, path, indicator='Test edit'):
+        """Single edit round"""
+
+        for (src, dst) in builder.edit_spec_file(str(path)):
+            print(indicator, file=dst)
+            dst.write(src.read())
+
+    def count_markers(path, marker='# Edited by rpmlb'):
+        """Count lines containing marker text in file"""
+
+        with path.open() as handle:
+            return sum(marker in line for line in handle)
+
+    builder = BaseBuilder()
+
+    for indicator in ('First edit', 'Second edit'):
+        edit_file(builder, empty_spec_path, indicator)
+        assert empty_spec_path.exists()
+        assert count_markers(empty_spec_path) == 1
