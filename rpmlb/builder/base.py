@@ -1,8 +1,8 @@
 import logging
-import os
 import re
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 
 import retrying
 
@@ -97,21 +97,32 @@ class BaseBuilder:
 
     @staticmethod
     @contextmanager
-    def edit_spec_file(spec_file):
-        spec_file_origin = '{0}.orig'.format(spec_file)
-        os.rename(spec_file, spec_file_origin)
-        fh_r = None
-        fh_w = None
-        try:
-            fh_r = open(spec_file_origin, 'r')
-            fh_w = open(spec_file, 'w')
-            fh_w.write('# Edited by rpmlb\n')
-            yield(fh_r, fh_w)
-        finally:
-            if fh_w:
-                fh_w.close()
-            if fh_r:
-                fh_r.close()
+    def edit_spec_file(target: Path):
+        """Safely edit a SPEC file in-place.
+
+        The target is backed up as '{target}.orig' if needed.
+
+        Keyword arguments:
+            target: The modified SPEC file path.
+
+        Returns:
+            Context manager providing open handles
+            for input and output file.
+        """
+
+        # Ensure path type
+        target = Path(target) if not isinstance(target, Path) else target
+
+        # Back up the original
+        source = target.with_suffix('.spec.orig')
+        if not source.exists():
+            target.rename(source)
+
+        # Provide the handles
+        with source.open(mode='r') as src, target.open(mode='w') as tgt:
+            print('# Edited by rpmlb', file=tgt)
+
+            yield src, tgt
 
     def edit_spec_file_by_macros(self, spec_file, macros_dict):
         if not isinstance(macros_dict, dict):
