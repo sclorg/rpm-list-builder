@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import sys
+from contextlib import contextmanager
 
 import retrying
 
@@ -94,7 +95,9 @@ class BaseBuilder:
     def build(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')
 
-    def edit_spec_file(self, spec_file):
+    @staticmethod
+    @contextmanager
+    def edit_spec_file(spec_file):
         spec_file_origin = '{0}.orig'.format(spec_file)
         os.rename(spec_file, spec_file_origin)
         fh_r = None
@@ -114,7 +117,7 @@ class BaseBuilder:
         if not isinstance(macros_dict, dict):
             return ValueError('macros should be dict object.')
 
-        for fh_r, fh_w in self.edit_spec_file(spec_file):
+        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
             for key in list(macros_dict.keys()):
                 value = macros_dict[key]
                 if value is None or str(value) == '':
@@ -128,7 +131,7 @@ class BaseBuilder:
         if not isinstance(macros_dict, dict):
             return ValueError('macros should be dict object.')
 
-        for fh_r, fh_w in self.edit_spec_file(spec_file):
+        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
             for line in fh_r:
                 line = line.rstrip()
                 for key in list(macros_dict.keys()):

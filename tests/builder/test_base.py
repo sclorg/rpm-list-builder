@@ -108,10 +108,10 @@ def get_mock_work():
 def test_double_edit(empty_spec_path):
     """Original spec file is not modified twice"""
 
-    def edit_file(builder, path, indicator='Test edit'):
+    def edit_file(path, indicator='Test edit'):
         """Single edit round"""
 
-        for (src, dst) in builder.edit_spec_file(str(path)):
+        with BaseBuilder.edit_spec_file(str(path)) as (src, dst):
             print(indicator, file=dst)
             dst.write(src.read())
 
@@ -121,9 +121,7 @@ def test_double_edit(empty_spec_path):
         with path.open() as handle:
             return sum(marker in line for line in handle)
 
-    builder = BaseBuilder()
-
     for indicator in ('First edit', 'Second edit'):
-        edit_file(builder, empty_spec_path, indicator)
+        edit_file(empty_spec_path, indicator)
         assert empty_spec_path.exists()
         assert count_markers(empty_spec_path) == 1
