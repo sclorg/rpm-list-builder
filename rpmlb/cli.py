@@ -34,7 +34,8 @@ from .work import Work
 )
 @click.option(
     '--work-directory', '-w',
-    type=click.Path(exists=True, file_okay=False, writable=True, resolve_path=True),
+    type=click.Path(exists=True, file_okay=False, writable=True,
+                    resolve_path=True),
     default=None,
     help='Specify a working directory.',
 )
@@ -75,7 +76,9 @@ from .work import Work
 )
 @click.argument('recipe_name')
 def run(recipe_file, recipe_name, **option_dict):
-    """Download and build RPMs listed in RECIPE_FILE under RECIPE_NAME (such as 'python33')."""
+    """Download and build RPMs listed in RECIPE_FILE under RECIPE_NAME
+    (such as 'python33').
+    """
 
     # Load recipe and processing objects
     recipe = Recipe(recipe_file, recipe_name)
