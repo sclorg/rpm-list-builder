@@ -111,7 +111,8 @@ class BaseBuilder:
         """
 
         # Ensure path type
-        target_path = Path(target_path) if not isinstance(target_path, Path) else target_path
+        if not isinstance(target_path, Path):
+            target_path = Path(target_path)
 
         # Back up the original
         source_path = target_path.with_suffix('.spec.orig')
