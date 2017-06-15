@@ -97,13 +97,13 @@ class BaseBuilder:
 
     @staticmethod
     @contextmanager
-    def edit_spec_file(target: Path):
+    def edit_spec_file(target_path: Path):
         """Safely edit a SPEC file in-place.
 
         The target is backed up as '{target}.orig' if needed.
 
         Keyword arguments:
-            target: The modified SPEC file path.
+            target_path: The modified SPEC file path.
 
         Returns:
             Context manager providing open handles
@@ -111,18 +111,19 @@ class BaseBuilder:
         """
 
         # Ensure path type
-        target = Path(target) if not isinstance(target, Path) else target
+        target_path = Path(target_path) if not isinstance(target_path, Path) else target_path
 
         # Back up the original
-        source = target.with_suffix('.spec.orig')
-        if not source.exists():
-            target.rename(source)
+        source_path = target_path.with_suffix('.spec.orig')
+        if not source_path.exists():
+            target_path.rename(source_path)
 
         # Provide the handles
-        with source.open(mode='r') as src, target.open(mode='w') as tgt:
-            print('# Edited by rpmlb', file=tgt)
+        with source_path.open(mode='r') as source_file, \
+                target_path.open(mode='w') as target_file:
+            print('# Edited by rpmlb', file=target_file)
 
-            yield src, tgt
+            yield source_file, target_file
 
     def edit_spec_file_by_macros(self, spec_file, macros_dict):
         if not isinstance(macros_dict, dict):
