@@ -1,7 +1,8 @@
 import logging
-import os
 import re
 import sys
+from contextlib import contextmanager
+from pathlib import Path
 
 import retrying
 
@@ -94,27 +95,42 @@ class BaseBuilder:
     def build(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')
 
-    def edit_spec_file(self, spec_file):
-        spec_file_origin = '{0}.orig'.format(spec_file)
-        os.rename(spec_file, spec_file_origin)
-        fh_r = None
-        fh_w = None
-        try:
-            fh_r = open(spec_file_origin, 'r')
-            fh_w = open(spec_file, 'w')
-            fh_w.write('# Edited by rpmlb\n')
-            yield(fh_r, fh_w)
-        finally:
-            if fh_w:
-                fh_w.close()
-            if fh_r:
-                fh_r.close()
+    @staticmethod
+    @contextmanager
+    def edit_spec_file(target_path: Path):
+        """Safely edit a SPEC file in-place.
+
+        The target is backed up as '{target}.orig' if needed.
+
+        Keyword arguments:
+            target_path: The modified SPEC file path.
+
+        Returns:
+            Context manager providing open handles
+            for input and output file.
+        """
+
+        # Ensure path type
+        if not isinstance(target_path, Path):
+            target_path = Path(target_path)
+
+        # Back up the original
+        source_path = target_path.with_suffix('.spec.orig')
+        if not source_path.exists():
+            target_path.rename(source_path)
+
+        # Provide the handles
+        with source_path.open(mode='r') as source_file, \
+                target_path.open(mode='w') as target_file:
+            print('# Edited by rpmlb', file=target_file)
+
+            yield source_file, target_file
 
     def edit_spec_file_by_macros(self, spec_file, macros_dict):
         if not isinstance(macros_dict, dict):
             return ValueError('macros should be dict object.')
 
-        for fh_r, fh_w in self.edit_spec_file(spec_file):
+        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
             for key in list(macros_dict.keys()):
                 value = macros_dict[key]
                 if value is None or str(value) == '':
@@ -128,7 +144,7 @@ class BaseBuilder:
         if not isinstance(macros_dict, dict):
             return ValueError('macros should be dict object.')
 
-        for fh_r, fh_w in self.edit_spec_file(spec_file):
+        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
             for line in fh_r:
                 line = line.rstrip()
                 for key in list(macros_dict.keys()):
