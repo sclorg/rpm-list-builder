@@ -1,4 +1,7 @@
 import logging
+from itertools import starmap
+from collections import Counter
+from typing import Iterator, Mapping, Union
 
 from rpmlb.yaml import Yaml
 
@@ -23,22 +26,39 @@ class Recipe:
         self.num_of_package = len(self.recipe['packages'])
 
     def each_normalized_package(self):
+        """Present recipe packages in normalized form.
+
+        Yields:
+            Dictionary with the package's data.
+
+        Common keys in the yielded dictionary:
+            - name: The package's name
+            - bootstrap_position: Numerical position in the bootstrapping
+                sequence, or None if no bootstrap is necessary.
+            - macros, replaced_macros: Mapping of macro name to (new)
+                macro body.
+        """
+
         packages = self.recipe['packages']
+        bootstrap_map = self._count_bootstrap_sequences()
+
         for package in packages:
-            package_dict = {}
-            # String or hash
-            if isinstance(package, str):
-                package_dict['name'] = package
-            elif isinstance(package, dict):
-                keys = list(package.keys())
-                name = keys[0]
-                if not package[name]:
-                    raise ValueError('Recipe package %s is invalid format.' %
-                                     name)
-                package_dict = package[name]
-                package_dict['name'] = name
-            else:
-                raise ValueError('package is invalid.')
+            name = self._package_name(package)
+            bootstrap_position = next(bootstrap_map[name], None)
+
+            package_dict = {
+                'name': name,
+                'bootstrap_position': bootstrap_position,
+            }
+
+            if isinstance(package, Mapping):
+                # package should be one-item dictionary
+                if len(package) != 1:
+                    message = 'Invalid package data: {}'.format(package)
+                    raise ValueError(message)
+
+                metadata, = package.values()
+                package_dict.update(metadata)
 
             yield package_dict
 
@@ -65,3 +85,56 @@ class Recipe:
                 raise ValueError('name is invalid in the package.')
 
         return True
+
+    @staticmethod
+    def _package_name(package: Union[str, dict]) -> str:
+        """Extract package name.
+
+        Keyword arguments:
+            package: Raw package data to analyze.
+                It should be either string or one-item dictionary.
+
+        Returns:
+            Name of the package.
+
+        Raises:
+            ValueError: Invalid package type.
+        """
+
+        if isinstance(package, str):  # The name itself
+            return package
+
+        elif isinstance(package, dict):
+            # package should be one-item dictionary
+            if len(package) != 1:
+                message = 'Invalid package data: {}'.format(package)
+                raise ValueError(message)
+
+            # The name is the only key
+            name, = package.keys()
+            return name
+
+        else:
+            message = 'Invalid type of package: {!r}'.format(type(package))
+            raise ValueError(message)
+
+    def _count_bootstrap_sequences(self) -> Mapping[str, Iterator[int]]:
+        """Count package instances and produce bootstrap sequences.
+
+        Returns:
+            Mapping of package number to iterator of bootstrap numbers.
+        """
+
+        name_list = map(self._package_name, self.recipe['packages'])
+        count_map = Counter(name_list)
+
+        def make_sequence(name: str, count: int):
+            """Count package instances except the last one; start from 1"""
+
+            sequence = range(1, count)
+            return name, iter(sequence)
+
+        # Create a dictionary from (name, sequence) tuples
+        sequence_map = dict(starmap(make_sequence, count_map.items()))
+
+        return sequence_map
