@@ -19,6 +19,7 @@ setuptools.setup(
         'PyYAML',
         'retrying',
         'click',
+        'typing;python_version<"3.5"',
     ],
     entry_points={
         'console_scripts': [
