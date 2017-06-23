@@ -61,6 +61,7 @@ class Recipe:
         if not isinstance(recipe['packages'], list):
             raise ValueError('packages should be a list.')
         for package_dict in self.each_normalized_package():
-            assert(package_dict['name'])
+            if not package_dict['name']:
+                raise ValueError('name is invalid in the package.')
 
         return True

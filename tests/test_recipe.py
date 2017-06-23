@@ -64,3 +64,12 @@ def test_verify_raises_error_on_recipe_with_non_list_packages(ok_recipe):
     ok_recipe.recipe['packages'] = 'abc'
     with pytest.raises(ValueError):
         ok_recipe.verify()
+
+
+def test_verify_raises_error_on_recipe_with_empty_package_name(ok_recipe):
+    ok_recipe.recipe['packages'] = [
+        'foo',
+        ''
+    ]
+    with pytest.raises(ValueError):
+        ok_recipe.verify()
