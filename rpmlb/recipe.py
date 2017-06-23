@@ -8,18 +8,18 @@ LOG = logging.getLogger(__name__)
 class Recipe:
     """A class to describe recipe data."""
 
-    def __init__(self, file_path, recipe_id):
+    def __init__(self, file_path, collection_id):
         if not file_path:
             raise ValueError('file_path is required.')
-        if not recipe_id:
-            raise ValueError('recipe_id is required.')
+        if not collection_id:
+            raise ValueError('collection_id is required.')
 
-        self._recipe_id = recipe_id
+        self._collection_id = collection_id
 
         yaml = Yaml(file_path)
         LOG.debug('Loaded recipe: %s', file_path)
         recipe_dict = yaml.content
-        self.recipe = recipe_dict[recipe_id]
+        self.recipe = recipe_dict[collection_id]
         self.num_of_package = len(self.recipe['packages'])
 
     def each_normalized_package(self):

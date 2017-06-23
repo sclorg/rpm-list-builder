@@ -151,7 +151,7 @@ work_directory/
           --download DOWNLOAD_TYPE \
           --build BUILD_TYPE \
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 ### Select download type
 
@@ -164,7 +164,7 @@ work_directory/
           --source-directory SOURCE_DIRECTORY \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 #### Rhpkg
 
@@ -175,7 +175,7 @@ work_directory/
           --branch BRANCH \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 #### Custom download
 
@@ -187,7 +187,7 @@ work_directory/
           --custom-file CUSTOM_FILE \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 2. What is the custom file? See [sample custom files](../tests/fixtures/custom). It is YAML file like `.travis.yml`. You can write shell script in the file.
 
@@ -205,7 +205,7 @@ work_directory/
           --work-directory WORK_DIRECTORY \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 ### Select build type
 
@@ -219,7 +219,7 @@ work_directory/
           --mock-config MOCK_CONFIG \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 #### Copr build
 
@@ -238,7 +238,7 @@ work_directory/
           --copr-repo COPR_REPO \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 #### Custom build
 
@@ -250,7 +250,7 @@ work_directory/
           --custom-file CUSTOM_FILE \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 2. What is the custom file? See [sample custom files](../tests/fixtures/custom). It is YAML file like `.travis.yml`. You can write shell script in the file.
 
@@ -266,7 +266,7 @@ work_directory/
           --build dummy \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID
 
 
 ### Resume from any position of pacakges
@@ -280,4 +280,4 @@ work_directory/
           --resume 35 \
           ...
           RECIPE_FILE \
-          RECIPE_ID
+          COLLECTION_ID

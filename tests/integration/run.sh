@@ -12,7 +12,7 @@ WORK_DIR="${TMP_DIR}/work_directory"
 CUSTOM_DIR="${ROOT_DIR}/tests/fixtures/custom"
 CLI="rpmlb"
 RECIPE_ORG_FILE="${RECIPE_DIR}/ror.yml"
-RECIPE_ID="rh-ror50"
+COLLECTION_ID="rh-ror50"
 RECEIPE_TEST_MIN_FILE="${RECIPE_DIR}/ror_test_min.yml"
 RECEIPE_TEST_MACRO_FILE="${RECIPE_DIR}/ror_test_macro.yml"
 BRANCH="rhscl-2.4-rh-ror50-rhel-7"
@@ -76,7 +76,7 @@ prepare_work_dir() {
         --source-directory "${SOURCE_DIR}" \
         --work-directory "${WORK_DIR}" \
         "${RECEIPE_TEST_MACRO_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -89,7 +89,7 @@ download_only_test() {
         --source-directory "${SOURCE_DIR}" \
         --work-directory "${test_work_dir}" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     local status="${?}"
     rm -rf "${test_work_dir}"
     return "${status}"
@@ -105,7 +105,7 @@ download_from_local_and_build_with_dummy_test() {
         --source-directory "${SOURCE_DIR}" \
         --work-directory "${test_work_dir}" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     local status="${?}"
     rm -rf "${test_work_dir}"
     return "${status}"
@@ -117,7 +117,7 @@ download_by_rhpkg_and_build_with_dummy_test() {
         --build dummy \
         --branch "${BRANCH}" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -127,7 +127,7 @@ download_with_custom_and_build_with_dummy_test() {
         --build dummy \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -138,7 +138,7 @@ build_only_verbose_test() {
         --verbose \
         --work-directory "${WORK_DIR}" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -155,7 +155,7 @@ build_only_with_mock_test() {
         --work-directory "${WORK_DIR}" \
         --mock-config "${MOCK_CONFIG}" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -170,7 +170,7 @@ build_only_with_custom_echo_test() {
         --work-directory "${WORK_DIR}" \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -182,7 +182,7 @@ build_only_with_custom_mock_test() {
         --work-directory "${WORK_DIR}" \
         --custom-file "${CUSTOM_DIR}/rhpkg_mock.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -195,7 +195,7 @@ build_only_resume_test() {
         --resume 3 \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MACRO_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -209,7 +209,7 @@ download_and_build_with_custom_echo_test() {
         --work-directory "${test_work_dir}" \
         --custom-file "${CUSTOM_DIR}/echo.yml" \
         "${RECEIPE_TEST_MACRO_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
@@ -223,7 +223,7 @@ download_and_build_with_custom_mock_test() {
         --work-directory "${test_work_dir}" \
         --custom-file "${CUSTOM_DIR}/rhpkg_mock.yml" \
         "${RECEIPE_TEST_MIN_FILE}" \
-        "${RECIPE_ID}"
+        "${COLLECTION_ID}"
     return "${?}"
 }
 
