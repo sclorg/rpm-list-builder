@@ -1,10 +1,11 @@
 import sys
+from collections import Counter
 from pathlib import Path
 from unittest import mock
 
 import pytest
 
-from rpmlb.builder.base import BaseBuilder
+from rpmlb.builder.base import BaseBuilder, MACRO_REGEX
 
 
 @pytest.fixture
@@ -14,10 +15,39 @@ def empty_spec_path(tmpdir):
     spec = Path(str(tmpdir), 'test.spec')
     spec.touch()
 
-    yield spec
+    with tmpdir.as_cwd():
+        yield spec
 
     if spec.exists():
         spec.unlink()
+
+
+@pytest.fixture
+def prepared_macros():
+    """Prepared testing spec macros"""
+
+    macro_dict = {
+        # Simple macro value
+        'test_macro_a': r'value',
+        # Macros with white space in the body
+        'test_macro_b': r'with spaces in value',
+        # Multi-line macro
+        'test_macro_c': r'''multi \
+            line''',
+    }
+
+    return macro_dict
+
+
+@pytest.fixture
+def macro_spec_path(empty_spec_path, prepared_macros):
+    """Path to a spec file containing some macro definitions"""
+
+    with empty_spec_path.open(mode='w') as out_file:
+        for name, value in prepared_macros.items():
+            print('%global {} {}'.format(name, value), file=out_file)
+
+    return empty_spec_path
 
 
 def test_init():
@@ -30,6 +60,7 @@ def test_run_calls_before_build_after():
     builder.before = mock.MagicMock()
     builder.build = mock.MagicMock(return_value=True)
     builder.after = mock.MagicMock()
+    builder.prepare = mock.MagicMock()
 
     mock_work = get_mock_work()
     builder.run(mock_work)
@@ -41,6 +72,7 @@ def test_run_calls_before_build_after():
 def test_run_returns_true_on_success():
     builder = BaseBuilder()
     builder.build = lambda *args, **kwargs: None
+    builder.prepare = mock.MagicMock()
 
     mock_work = get_mock_work()
     assert builder.run(mock_work)
@@ -49,6 +81,7 @@ def test_run_returns_true_on_success():
 def test_run_exception():
     builder = BaseBuilder()
     builder.build = mock.Mock(side_effect=ValueError('test'))
+    builder.prepare = mock.MagicMock()
 
     mock_work = get_mock_work()
     type(mock_work).working_dir = mock.PropertyMock(return_value='work_dir')
@@ -82,6 +115,7 @@ def test_run_does_not_call_before_calls_build_after_with_resume_option():
     builder.before = mock.MagicMock()
     builder.build = mock.MagicMock(return_value=True)
     builder.after = mock.MagicMock()
+    builder.prepare = mock.MagicMock()
 
     mock_work = get_mock_work()
     builder.run(mock_work, resume=2)
@@ -125,3 +159,88 @@ def test_double_edit(empty_spec_path):
         edit_file(empty_spec_path, indicator)
         assert empty_spec_path.exists()
         assert count_markers(empty_spec_path) == 1
+
+
+def test_macros_are_added_correctly(macro_spec_path, prepared_macros):
+    """Macros are safely added without messing with current file contents."""
+
+    new_macro_dict = {
+        'bootstrap': 1,
+        'with_bootstrap': 1,
+    }
+
+    with BaseBuilder.edit_spec_file(macro_spec_path) as (original, modified):
+        content_stream = BaseBuilder.add_macros(original, new_macro_dict)
+        modified.write(''.join(content_stream))
+
+    with macro_spec_path.open() as spec_file:
+        spec_contents = spec_file.read()
+
+    # Count the macro occurrences
+    matches = MACRO_REGEX.finditer(spec_contents)
+    macro_counts = Counter(match.group('name') for match in matches)
+
+    # Each expected macro is present exactly once
+    assert all(cnt == 1 for cnt in macro_counts.values()), macro_counts
+
+    expected_macro_names = new_macro_dict.keys() | prepared_macros.keys()
+    present_macro_names = macro_counts.keys()
+    assert expected_macro_names == present_macro_names, present_macro_names
+
+
+def test_macros_are_replaced_correctly(macro_spec_path, prepared_macros):
+    """Macros are correctly replaced."""
+
+    replaced_macro_dict = dict.fromkeys(prepared_macros, 'REPLACED')
+
+    with BaseBuilder.edit_spec_file(macro_spec_path) as (original, modified):
+        content_stream = BaseBuilder.replace_macros(
+            original,
+            replaced_macro_dict,
+        )
+        modified.write(''.join(content_stream))
+
+    with macro_spec_path.open() as spec_file:
+        spec_contents = spec_file.read()
+
+    result_macros = dict(MACRO_REGEX.findall(spec_contents))
+
+    # All expected macros have their contents replaced
+    assert all(val == 'REPLACED' for val in result_macros.values()), \
+        result_macros  # show the macro values when debugging
+
+
+def test_prepare_runs_all_preparations(macro_spec_path, prepared_macros):
+    """All preparations are done as expected
+
+    1. `replace_macros` are replaced
+    2. New macros are added
+    3. Any builder-custom parts are executed
+    """
+
+    package_metadata = {
+        'name': macro_spec_path.stem,
+        'macros': dict(a='macro a', b='macro b'),
+        'replaced_macros': dict.fromkeys(prepared_macros, 'REPLACED'),
+    }
+
+    builder = BaseBuilder()
+    builder.prepare_extra_steps = mock.MagicMock(
+        wraps=builder.prepare_extra_steps,
+    )
+
+    builder.prepare(package_metadata)
+
+    with macro_spec_path.open() as spec_file:
+        spec_contents = spec_file.read()
+
+    macros = dict(MACRO_REGEX.findall(spec_contents))
+
+    # Adding is performed
+    assert all(macros[name] == package_metadata['macros'][name]
+               for name in package_metadata['macros'])
+    # Replacement is performed
+    assert all(macros[name] == 'REPLACED'
+               for name in package_metadata['replaced_macros'])
+    # Extra preparation steps are performed
+    assert builder.prepare_extra_steps.called

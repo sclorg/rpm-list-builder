@@ -3,12 +3,24 @@ import re
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Any, Iterator, Mapping, Match
 
 import retrying
 
 from .. import utils
 
 LOG = logging.getLogger(__name__)
+
+
+#: Regular expression for finding macro definitions
+MACRO_REGEX = re.compile(
+    r'''^
+    %global\s+                   # beginning of definition
+    (?P<name>[^\s]+)\s+          # one-word name
+    (?P<value>(?:.|(?<=\\)\n)+)  # value including spaces and escaped newlines
+    $''',
+    flags=re.MULTILINE | re.VERBOSE,
+)
 
 
 class BaseBuilder:
@@ -78,15 +90,40 @@ class BaseBuilder:
     def after(self, work, **kwargs):
         pass
 
-    def prepare(self, package_dict):
+    def prepare(self, package_dict: Mapping[str, Any]):
+        """Prepare single package for a build.
+
+        Keyword arguments:
+            package_dict: A dictionary of package metadata.
+        """
+
         if 'name' not in package_dict:
             raise ValueError('package_dict is invalid.')
-        spec_file = '{0}.spec'.format(package_dict['name'])
-        if 'macros' in package_dict:
-            self.edit_spec_file_by_macros(spec_file, package_dict['macros'])
-        if 'replaced_macros' in package_dict:
-            self.edit_spec_file_by_replaced_macros(
-                spec_file, package_dict['replaced_macros'])
+
+        spec_file_path = Path('{name}.spec'.format_map(package_dict))
+
+        with self.edit_spec_file(spec_file_path) as (source_file, target_file):
+            content_stream = iter(source_file)  # Start modifications
+
+            if 'replaced_macros' in package_dict:
+                content_stream = self.replace_macros(
+                    content_stream,
+                    package_dict['replaced_macros'],
+                )
+
+            if 'macros' in package_dict:
+                content_stream = self.add_macros(
+                    content_stream,
+                    package_dict['macros'],
+                )
+
+            # Perform any extra edits needed by derived builder
+            content_stream = self.prepare_extra_steps(
+                content_stream,
+                package_dict,
+            )
+
+            target_file.write(''.join(content_stream))  # End modifications
 
     @retrying.retry(stop_max_attempt_number=3)
     def build_with_retrying(self, package_dict, **kwargs):
@@ -126,31 +163,72 @@ class BaseBuilder:
 
             yield source_file, target_file
 
-    def edit_spec_file_by_macros(self, spec_file, macros_dict):
-        if not isinstance(macros_dict, dict):
-            return ValueError('macros should be dict object.')
+            # Ensure that all unprocessed source contents
+            # are written to the target
+            target_file.write(source_file.read())
 
-        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
-            for key in list(macros_dict.keys()):
-                value = macros_dict[key]
-                if value is None or str(value) == '':
-                    raise ValueError('macro is invalid in {0}.'.format(key))
-                content = '%global {0} {1}\n'.format(key, value)
-                fh_w.write(content)
-            fh_w.write('\n')
-            fh_w.write(fh_r.read())
+    @staticmethod
+    def add_macros(source: Iterator[str], macros: Mapping[str, str]):
+        """Add macro definitions to the source stream.
 
-    def edit_spec_file_by_replaced_macros(self, spec_file, macros_dict):
-        if not isinstance(macros_dict, dict):
-            return ValueError('macros should be dict object.')
+        Keyword arguments:
+            source: The source file iterator.
+            macros: Mapping of macro name to macro definition
+                    for all macros to add.
 
-        with self.edit_spec_file(spec_file) as (fh_r, fh_w):
-            for line in fh_r:
-                line = line.rstrip()
-                for key in list(macros_dict.keys()):
-                    value = macros_dict[key]
-                    pattern = r'^%global\s+{0}\s+[^\s]+$'.format(key)
-                    replaced_str = r'%global {0} {1}'.format(key, value)
+        Yields:
+            Lines of the modified file.
+        """
 
-                    line = re.sub(pattern, replaced_str, line)
-                fh_w.write(line + '\n')
+        # Prepend all definitions before the stream
+        for name, value in macros.items():
+            yield '%global {name} {value}\n'.format(name=name, value=value)
+
+        # Pass the rest of the file
+        yield from source
+
+    @staticmethod
+    def replace_macros(source: Iterator[str], macros: Mapping[str, str]):
+        """Replace macros in the source stream with new values.
+
+        Keyword arguments:
+            source: The source file iterator.
+            macros: Mapping of macro name to macro definition
+                    for all macros to be replaced.
+
+        Yields:
+            Lines of the modified file.
+        """
+
+        def replacement(match: Match) -> str:
+            """Macro replacement logic"""
+
+            macro_name = match.group('name')
+            macro_value = macros.get(macro_name, match.group('value'))
+            return '%global {} {}'.format(macro_name, macro_value)
+
+        # Need whole file contents for matching multi-line macros
+        contents = ''.join(source)
+
+        # Substitute all macros
+        contents = MACRO_REGEX.sub(replacement, contents)
+
+        # Pass the modified lines
+        yield from contents.splitlines(keepends=True)
+
+    def prepare_extra_steps(
+        self,
+        source: Iterator[str],
+        package_metadata: Mapping[str, Any]
+    ):
+        """Builder-specific package preparation.
+
+        Override if needed.
+
+        Keyword arguments:
+            source: The source file iterator.
+            package_metadata: The metadata of the prepared package,
+                as passed to prepare().
+        """
+
+        yield from source  # pass for generators
