@@ -1,7 +1,7 @@
 import logging
 
-from rpmlb.downloader.base import BaseDownloader
 from rpmlb.custom import Custom
+from rpmlb.downloader.base import BaseDownloader
 
 LOG = logging.getLogger(__name__)
 

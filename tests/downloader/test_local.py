@@ -1,8 +1,8 @@
 import os
 import tempfile
 
-from rpmlb.downloader.local import LocalDownloader
 import helper
+from rpmlb.downloader.local import LocalDownloader
 
 
 def test_init():

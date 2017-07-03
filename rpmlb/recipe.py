@@ -1,6 +1,6 @@
 import logging
-from itertools import starmap
 from collections import Counter
+from itertools import starmap
 from typing import Iterator, Mapping, Union
 
 from rpmlb.yaml import Yaml

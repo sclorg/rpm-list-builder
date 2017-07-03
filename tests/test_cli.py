@@ -1,7 +1,7 @@
 """Test argument parsing"""
 
-import os
 import logging
+import os
 from pathlib import Path
 from textwrap import dedent
 
@@ -57,17 +57,17 @@ def recipe_arguments(recipe_path):
 def test_parse_argv_no_options(tmpdir, option):
     """Tests proper default values of the CLI"""
 
-    RECIPE_FILE = tmpdir.join('ror.yml')
-    RECIPE_NAME = 'rh-ror50'
+    recipe_file = tmpdir.join('ror.yml')
+    recipe_name = 'rh-ror50'
 
     # Prepare environment
-    RECIPE_FILE.write('')
+    recipe_file.write('')
 
     current_dir = os.path.abspath(os.getcwd())
 
     expected = {
-        'recipe_file': str(RECIPE_FILE),
-        'recipe_name': str(RECIPE_NAME),
+        'recipe_file': str(recipe_file),
+        'recipe_name': str(recipe_name),
         'build': 'dummy',
         'download': 'none',
         'branch': None,
@@ -76,7 +76,7 @@ def test_parse_argv_no_options(tmpdir, option):
 
     # Parse the arguments
     with tmpdir.as_cwd():
-        argv = list(map(str, [RECIPE_FILE, RECIPE_NAME]))
+        argv = list(map(str, [recipe_file, recipe_name]))
         args = run.make_context('rpmlb', argv).params
 
     assert args[option] == expected[option]

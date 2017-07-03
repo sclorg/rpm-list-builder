@@ -1,7 +1,7 @@
 import logging
 
-from rpmlb.builder.base import BaseBuilder
 from rpmlb import utils
+from rpmlb.builder.base import BaseBuilder
 
 LOG = logging.getLogger(__name__)
 

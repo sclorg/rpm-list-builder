@@ -1,9 +1,9 @@
-from contextlib import contextmanager
 import importlib
 import logging
 import os
 import subprocess
 import sys
+from contextlib import contextmanager
 
 LOG = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 
-from rpmlb.builder.base import BaseBuilder, MACRO_REGEX
+from rpmlb.builder.base import MACRO_REGEX, BaseBuilder
 
 
 @pytest.fixture

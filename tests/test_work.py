@@ -4,9 +4,8 @@ import shutil
 import tempfile
 from unittest import mock
 
-from rpmlb.work import Work
-
 import helper
+from rpmlb.work import Work
 
 
 def test_init():
