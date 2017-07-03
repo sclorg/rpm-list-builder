@@ -3,8 +3,10 @@ pytest
 # Code Analysis
 flake8
 flake8-colors
-# flake8-import-order
-# flake8-pep257
+# flake8-docstrings
+flake8-isort
+# The pep8-naming is used as a plugin for flake8
+pep8-naming
 # Code Formatter
 pyformat
 # Coverage
