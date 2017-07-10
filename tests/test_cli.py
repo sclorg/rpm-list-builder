@@ -52,13 +52,13 @@ def recipe_arguments(recipe_path):
     return [str(recipe_path), 'test']
 
 
-@pytest.mark.parametrize('option', ('recipe_file', 'recipe_name', 'build',
+@pytest.mark.parametrize('option', ('recipe_file', 'collection_id', 'build',
                                     'download', 'branch', 'source_directory'))
 def test_parse_argv_no_options(tmpdir, option):
     """Tests proper default values of the CLI"""
 
     recipe_file = tmpdir.join('ror.yml')
-    recipe_name = 'rh-ror50'
+    collection_id = 'rh-ror50'
 
     # Prepare environment
     recipe_file.write('')
@@ -67,7 +67,7 @@ def test_parse_argv_no_options(tmpdir, option):
 
     expected = {
         'recipe_file': str(recipe_file),
-        'recipe_name': str(recipe_name),
+        'collection_id': str(collection_id),
         'build': 'dummy',
         'download': 'none',
         'branch': None,
@@ -76,7 +76,7 @@ def test_parse_argv_no_options(tmpdir, option):
 
     # Parse the arguments
     with tmpdir.as_cwd():
-        argv = list(map(str, [recipe_file, recipe_name]))
+        argv = list(map(str, [recipe_file, collection_id]))
         args = run.make_context('rpmlb', argv).params
 
     assert args[option] == expected[option]
@@ -189,3 +189,14 @@ def test_simple_options(runner, recipe_arguments, option, value):
                            options + recipe_arguments)
 
     assert ctx.params[option.replace('-', '_')] == value
+
+
+@pytest.mark.parametrize('help_switch', ['--help', '-h'])
+def test_help_option_variants(runner, help_switch, recipe_arguments):
+    """Test that both short and long version of help switch works."""
+
+    # NOTE: recipe_arguments are necessary, both run.make_context and
+    # runner.invoke break without them for some reason
+    result = runner.invoke(run, [help_switch] + recipe_arguments)
+
+    assert result.exit_code == 0, result.output
