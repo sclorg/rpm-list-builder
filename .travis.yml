@@ -1,4 +1,5 @@
 language: python
+
 python:
 - '3.6'
 - '3.5'
@@ -6,23 +7,25 @@ python:
 
 matrix:
   include:
-    - python: 3.6
-      sudo: required
-      dist: trusty
+    - python: '3.6'
       env:
-      - TOXENV=style
-      before_install:
-      - sudo sed -i 's/trusty/yakkety/' /etc/apt/sources.list
-      - sudo rm -rf /etc/apt/sources.list.d/*
-      - sudo apt-get -qq update && sudo apt-get -qq install shellcheck
+      - TOXENV=style EXTRA_PKGS="ShellCheck which"
 
-cache:
-  directories:
-  - $HOME/.cache/pip
-  - .eggs
+sudo: required
+dist: trusty
+
+services:
+  - docker
 
 install:
-- pip install --upgrade pip setuptools
-- pip install tox-travis
+  - >
+    docker build --build-arg PYTHON=python${TRAVIS_PYTHON_VERSION}
+    --build-arg EXTRA_PKGS="$EXTRA_PKGS" -t rpmlb .
 
-script: tox
+before_script:
+  - sudo chown -R 1000 .
+
+script:
+  - >
+    docker run -v $(pwd):$(pwd) -w $(pwd) -i
+    -e TOXENV=${TOXENV:=py${TRAVIS_PYTHON_VERSION/./}} -t rpmlb
