@@ -1,3 +1,4 @@
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -46,6 +47,9 @@ def macro_spec_path(empty_spec_path, prepared_macros):
     with empty_spec_path.open(mode='w') as out_file:
         for name, value in prepared_macros.items():
             print('%global {} {}'.format(name, value), file=out_file)
+
+        print('BuildRequires foo', file=out_file)
+        print('BuildRequires bar', file=out_file)
 
     return empty_spec_path
 
@@ -215,13 +219,19 @@ def test_prepare_runs_all_preparations(macro_spec_path, prepared_macros):
 
     1. `replace_macros` are replaced
     2. New macros are added
-    3. Any builder-custom parts are executed
+    3. Any builder extra steps are executed
+    4. Commands in cmd element are executed
     """
 
+    spec_file_name = macro_spec_path.name
     package_metadata = {
         'name': macro_spec_path.stem,
         'macros': dict(a='macro a', b='macro b'),
         'replaced_macros': dict.fromkeys(prepared_macros, 'REPLACED'),
+        'cmd': [
+            'sed -i "/^BuildRequires foo$/ s/^/#/" {0}'.format(spec_file_name),
+            'sed -i "/^BuildRequires bar$/ s/^/#/" {0}'.format(spec_file_name),
+        ],
     }
 
     builder = BaseBuilder()
@@ -244,3 +254,8 @@ def test_prepare_runs_all_preparations(macro_spec_path, prepared_macros):
                for name in package_metadata['replaced_macros'])
     # Extra preparation steps are performed
     assert builder.prepare_extra_steps.called
+
+    assert re.search('^#BuildRequires foo$',
+                     spec_contents, flags=re.MULTILINE)
+    assert re.search('^#BuildRequires bar$',
+                     spec_contents, flags=re.MULTILINE)

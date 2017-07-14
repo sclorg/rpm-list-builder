@@ -1,6 +1,5 @@
 import logging
 
-from rpmlb import utils
 from rpmlb.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
@@ -19,20 +18,17 @@ class Custom:
         if 'name' in kwargs:
             env['PKG'] = kwargs['name']
 
-        for cmd in self.each_yaml_cmd(key):
-            utils.run_cmd(cmd, env=env)
-
-    def each_yaml_cmd(self, key):
-        cmd_dict = self._get_yaml_content(self._file_path)
+        cmd_dict = self.yaml_content
         if key not in cmd_dict:
             return
-        cmds = cmd_dict[key]
-        for cmd in cmds:
-            yield cmd
+        cmd_element = cmd_dict[key]
 
-    def _get_yaml_content(self, file_path):
+        Yaml.run_cmd_element(cmd_element, env=env)
+
+    @property
+    def yaml_content(self):
         if self._yaml_content:
             return self._yaml_content
-        yaml = Yaml(file_path)
+        yaml = Yaml(self._file_path)
         self._yaml_content = yaml.content
         return self._yaml_content

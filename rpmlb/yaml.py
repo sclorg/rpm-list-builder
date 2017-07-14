@@ -3,6 +3,8 @@ import os
 
 import yaml
 
+from . import utils
+
 LOG = logging.getLogger(__name__)
 
 
@@ -29,3 +31,17 @@ class Yaml:
         output = yaml.dump(self.content, Dumper=Dumper,
                            default_flow_style=False)
         print(output)
+
+    @staticmethod
+    def run_cmd_element(cmd_element, **kwargs):
+        if isinstance(cmd_element, str):
+            cmds = [cmd_element]
+        elif isinstance(cmd_element, list):
+            cmds = cmd_element
+        else:
+            message = 'Invalid type of cmd_element: {!r}'.format(
+                type(cmd_element)
+            )
+            raise ValueError(message)
+        for cmd in cmds:
+            utils.run_cmd(cmd, **kwargs)

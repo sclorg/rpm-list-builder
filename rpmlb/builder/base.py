@@ -8,6 +8,7 @@ from typing import Any, Iterator, Mapping, Match
 import retrying
 
 from .. import utils
+from ..yaml import Yaml
 
 LOG = logging.getLogger(__name__)
 
@@ -124,6 +125,9 @@ class BaseBuilder:
             )
 
             target_file.write(''.join(content_stream))  # End modifications
+
+        if 'cmd' in package_dict:
+            Yaml.run_cmd_element(package_dict['cmd'])
 
     @retrying.retry(stop_max_attempt_number=3)
     def build_with_retrying(self, package_dict, **kwargs):

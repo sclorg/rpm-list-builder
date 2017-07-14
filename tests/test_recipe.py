@@ -3,12 +3,13 @@ from collections.abc import Mapping
 
 import pytest
 
+import helper
 from rpmlb.recipe import Recipe
 
 
 @pytest.fixture
 def ok_recipe():
-    return Recipe('tests/fixtures/recipes/ror.yml', 'rh-ror50')
+    return Recipe(helper.get_valid_recipe_file(), 'rh-ror50')
 
 
 @pytest.fixture
@@ -60,7 +61,7 @@ def test_recipe(ok_recipe):
 
 def test_recipe_not_found():
     with pytest.raises(KeyError):
-        Recipe('tests/fixtures/recipes/ror.yml', 'dummy')
+        Recipe(helper.get_valid_recipe_file(), 'dummy')
 
 
 def test_verify_returns_true_on_valid_recipe(ok_recipe):
