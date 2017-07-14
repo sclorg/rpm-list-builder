@@ -1,11 +1,9 @@
 import setuptools
 
-import rpmlb
-
 setuptools.setup(
     name='rpmlb',
     license='GPLv2+',
-    version=rpmlb.__version__,
+    use_scm_version=True,
     description='Software Collection Rebuild Helper',
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
@@ -28,6 +26,7 @@ setuptools.setup(
     },
     setup_requires=[
         'pytest-runner',
+        'setuptools_scm',
     ],
     classifiers=[
         'License :: OSI Approved :: '
