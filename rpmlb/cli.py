@@ -15,6 +15,7 @@ from .work import Work
 @click.command(add_help_option=False)
 # General options
 @click.help_option('--help', '-h')  # Enable short help switch (-h)
+@click.version_option()
 @click.option(
     '--verbose', '-v', is_flag=True, default=False,
     help='Turn on verbose logging.',

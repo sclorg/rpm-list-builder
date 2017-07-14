@@ -194,3 +194,14 @@ def test_help_option_variants(runner, help_switch, recipe_arguments):
     result = runner.invoke(run, [help_switch] + recipe_arguments)
 
     assert result.exit_code == 0, result.output
+
+
+@pytest.mark.parametrize('version_switch', ['--version'])
+def test_version_option(runner, version_switch):
+    """Test that --version option displays the version"""
+    result = runner.invoke(run, [version_switch])
+    out = result.output.strip()
+
+    assert result.exit_code == 0
+    assert len(out.split('\n')) == 1
+    assert 'version' in out
