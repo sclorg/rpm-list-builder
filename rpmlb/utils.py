@@ -86,7 +86,7 @@ def run_cmd(cmd, **kwargs):
         LOG.debug('CMD: %s, kwargs: %s', cmd, repr(kwargs))
 
         env = os.environ.copy()
-        env['LC_ALL'] = 'C.utf-8'  # better to parse English output
+        env['LC_ALL'] = 'en_US.utf-8'  # better to parse English output
         if 'env' in kwargs:
             env.update(kwargs['env'])
         kwargs['env'] = env
