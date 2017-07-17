@@ -9,7 +9,7 @@ matrix:
   include:
     - python: '3.4'
       env:
-      - DNF=yum CONTAINER_IMAGE=jsmigel/centos-epel
+      - CONTAINER_IMAGE=jsmigel/centos-epel DNF=yum
     - python: '3.6'
       env:
       - TOXENV=style EXTRA_PKGS="ShellCheck which"
@@ -21,19 +21,28 @@ services:
   - docker
 
 before_install:
-  - if [ "x${CONTAINER_IMAGE}" != 'x' ]; then
-        sed -i "s@fedora@${CONTAINER_IMAGE}@" Dockerfile;
+  - |
+    if [ "x${CONTAINER_IMAGE}" != 'x' ]; then
+        sed -i "/^FROM / s@fedora@${CONTAINER_IMAGE}@" Dockerfile
     fi
 
 install:
-  - >
-    docker build --build-arg PYTHON=python${TRAVIS_PYTHON_VERSION}
-    --build-arg EXTRA_PKGS="$EXTRA_PKGS" --build-arg DNF=${DNF:=dnf} -t rpmlb .
+  - |
+    docker build \
+        --build-arg PYTHON=python${TRAVIS_PYTHON_VERSION} \
+        --build-arg EXTRA_PKGS="${EXTRA_PKGS}" \
+        --build-arg DNF=${DNF:=dnf} \
+        -t rpmlb \
+        .
 
 before_script:
   - sudo chown -R 1000 .
 
 script:
-  - >
-    docker run -v $(pwd):$(pwd) -w $(pwd) -i
-    -e TOXENV=${TOXENV:=py${TRAVIS_PYTHON_VERSION/./}} -t rpmlb
+  - |
+    docker run \
+        -v $(pwd):$(pwd) \
+        -w $(pwd) \
+        -i \
+        -e TOXENV=${TOXENV:=py${TRAVIS_PYTHON_VERSION/./}} \
+        -t rpmlb

@@ -4,7 +4,9 @@ ARG PYTHON
 ARG EXTRA_PKGS
 ARG DNF=dnf
 
-RUN $DNF -y install --setopt=install_weak_deps=false --setopt=tsflags=nodocs \
+RUN $DNF -y install \
+    --setopt=install_weak_deps=false \
+    --setopt=tsflags=nodocs \
     --setopt=deltarpm=0 \
     rpm-build git /usr/bin/$PYTHON $EXTRA_PKGS \
     && $DNF clean all
