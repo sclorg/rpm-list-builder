@@ -2,9 +2,11 @@ import os
 import re
 import shutil
 import tempfile
+from contextlib import closing
 from unittest import mock
 
-import helper
+import pytest
+
 from rpmlb.work import Work
 
 
@@ -50,31 +52,25 @@ def test_close():
 
 
 def test_num_name_from_count():
-    work = None
-    try:
-        mock_recipe = mock.MagicMock()
-        type(mock_recipe).num_of_package = mock.PropertyMock(return_value=11)
-        work = Work(mock_recipe)
+    mock_recipe = mock.MagicMock()
+    type(mock_recipe).num_of_package = mock.PropertyMock(return_value=11)
+
+    with closing(Work(mock_recipe)) as work:
         assert work
         assert work.num_name_from_count(2) == '02'
         assert work.num_name_from_count(10) == '10'
-    finally:
-        work.close()
 
 
 def test_each_num_dir():
-    work = None
+    mock_recipe = mock.MagicMock()
+    type(mock_recipe).num_of_package = mock.PropertyMock(return_value=2)
+    package_dicts = [
+        {'name': 'a'},
+        {'name': 'b'},
+    ]
+    mock_recipe.each_normalized_package.return_value = iter(package_dicts)
 
-    try:
-        mock_recipe = mock.MagicMock()
-        type(mock_recipe).num_of_package = mock.PropertyMock(return_value=2)
-        package_dicts = [
-            {'name': 'a'},
-            {'name': 'b'},
-        ]
-        mock_recipe.each_normalized_package.return_value = iter(package_dicts)
-
-        work = Work(mock_recipe)
+    with closing(Work(mock_recipe)) as work:
         assert work
 
         for package_dict, num_name in work.each_num_dir():
@@ -83,8 +79,6 @@ def test_each_num_dir():
             assert re.match('^[12]$', num_name)
             assert re.match('^.+/[12]$', os.getcwd())
 
-        with helper.pushd(work.working_dir):
+        with pytest.helpers.pushd(work.working_dir):
             assert os.path.isdir('1')
             assert os.path.isdir('2')
-    finally:
-        work.close()

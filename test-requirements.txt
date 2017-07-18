@@ -11,5 +11,7 @@ pep8-naming
 pyformat
 # Coverage
 pytest-cov
+# Helper function namespace
+pytest-helpers-namespace
 # Documentation
 # Sphinx

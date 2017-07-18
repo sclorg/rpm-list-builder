@@ -41,10 +41,11 @@ def test_run_cmds_runs_cmd_by_cmd_element_type_string():
 
 
 def test_run_cmds_runs_cmds_by_cmd_element_type_list():
-    random_file_foo = helper.get_random_generated_tmp_file()
-    random_file_bar_part = helper.get_random_generated_tmp_file()
-    random_file_bar = random_file_bar_part + '-bar'
-    try:
+    with pytest.helpers.generate_tmp_path_list(2) as tmp_files:
+        random_file_foo, random_file_bar_part = tmp_files
+        random_file_bar = random_file_bar_part.with_name(
+            random_file_bar_part.name + '-bar'
+        )
 
         cmd_element = [
             'touch {0}'.format(random_file_foo),
@@ -55,11 +56,8 @@ def test_run_cmds_runs_cmds_by_cmd_element_type_list():
         }
         Yaml.run_cmd_element(cmd_element, env=env)
 
-        assert os.path.isfile(random_file_foo)
-        assert os.path.isfile(random_file_bar)
-    finally:
-        helper.remove_if_is_file(random_file_foo)
-        helper.remove_if_is_file(random_file_bar)
+        assert random_file_foo.is_file()
+        assert random_file_bar.is_file()
 
 
 def test_run_cmds_raises_error_on_cmd_element_type_dict():
