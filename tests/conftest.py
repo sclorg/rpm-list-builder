@@ -100,14 +100,14 @@ def random_file_path():
         yield path
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def valid_recipe_path():
     """Provide path to a valid recipe file."""
 
     return Path('tests/fixtures/recipes/ror.yml')
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def valid_custom_file_path():
     """Provide path to a valid custom file."""
 
