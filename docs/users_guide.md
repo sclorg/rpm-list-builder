@@ -3,6 +3,8 @@
 This document is to explain use case with actual command line.
 About the example, you can refer an integration test script [tests/integration/run.sh](../tests/integration/run.sh) test_foo method too.
 
+For documentation on the recipe file format, see the [RHSCL Rebuild Recipes](https://github.com/sclorg/rhscl-rebuild-recipes).
+
 ## Architecture
 
 The application is to help building a list of RPM packages.
