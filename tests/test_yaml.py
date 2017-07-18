@@ -1,15 +1,12 @@
-import os
-
 import pytest
 
-import helper
 from rpmlb.yaml import Yaml
 
 
 @pytest.fixture
-def valid_yaml():
+def valid_yaml(valid_recipe_path):
     """A Yaml object with a valid YAML file."""
-    return Yaml(helper.get_valid_recipe_file())
+    return Yaml(str(valid_recipe_path))
 
 
 def test_init_loads_file(valid_yaml):
@@ -27,17 +24,13 @@ def test_dump_prints_output(capsys, valid_yaml):
     assert 'rh-ror50:' in stdout
 
 
-def test_run_cmds_runs_cmd_by_cmd_element_type_string():
+def test_run_cmds_runs_cmd_by_cmd_element_type_string(random_file_path):
     # Test with generated file.
     # Because we can not test using stdout with capsys fixture,
     # the capsys does not capture stdout from subprocess in run_cmds.
-    random_file = helper.get_random_generated_tmp_file()
-    try:
-        cmd_element = "touch {0}".format(random_file)
-        Yaml.run_cmd_element(cmd_element)
-        assert os.path.isfile(random_file)
-    finally:
-        helper.remove_if_is_file(random_file)
+    cmd_element = "touch {0!s}".format(random_file_path)
+    Yaml.run_cmd_element(cmd_element)
+    assert random_file_path.is_file()
 
 
 def test_run_cmds_runs_cmds_by_cmd_element_type_list():

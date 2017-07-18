@@ -3,13 +3,12 @@ from collections.abc import Mapping
 
 import pytest
 
-import helper
 from rpmlb.recipe import Recipe
 
 
 @pytest.fixture
-def ok_recipe():
-    return Recipe(helper.get_valid_recipe_file(), 'rh-ror50')
+def ok_recipe(valid_recipe_path):
+    return Recipe(str(valid_recipe_path), 'rh-ror50')
 
 
 @pytest.fixture
@@ -59,9 +58,9 @@ def test_recipe(ok_recipe):
     assert ok_recipe.recipe
 
 
-def test_recipe_not_found():
+def test_recipe_not_found(valid_recipe_path):
     with pytest.raises(KeyError):
-        Recipe(helper.get_valid_recipe_file(), 'dummy')
+        Recipe(str(valid_recipe_path), 'dummy')
 
 
 def test_verify_returns_true_on_valid_recipe(ok_recipe):

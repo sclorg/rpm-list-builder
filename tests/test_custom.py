@@ -1,16 +1,14 @@
-import os
 from unittest import mock
 
 import pytest
 
-import helper
 from rpmlb.custom import Custom
 
 
 @pytest.fixture
-def valid_custom():
+def valid_custom(valid_custom_file_path):
     """A Custom object with a valid custom file."""
-    return Custom(helper.get_valid_custom_file())
+    return Custom(valid_custom_file_path)
 
 
 def test_init_loads_file(valid_custom):
@@ -40,25 +38,20 @@ def test_run_cmds_runs_cmds_on_valid_custom_file(valid_custom):
         assert random_file_foo.is_file()
         assert random_file_bar.is_file()
 
-def test_run_cmds_skips_cmds_on_unknown_key(valid_custom):
-    random_file_foo = None
-    try:
-        random_file_foo = helper.get_random_generated_tmp_file()
 
-        content = {
-            'build': [
-                'touch {0}'.format(random_file_foo),
-            ]
-        }
-        type(valid_custom).yaml_content = mock.PropertyMock(
-                                          return_value=content)
+def test_run_cmds_skips_cmds_on_unknown_key(valid_custom, random_file_path):
+    content = {
+        'build': [
+            'touch {0!s}'.format(random_file_path),
+        ]
+    }
+    type(valid_custom).yaml_content = mock.PropertyMock(
+        return_value=content,
+    )
 
-        valid_custom.run_cmds('dummy')
+    valid_custom.run_cmds('dummy')
 
-        assert not os.path.isfile(random_file_foo)
-    finally:
-        if os.path.isfile(random_file_foo):
-            os.remove(random_file_foo)
+    assert not random_file_path.is_file()
 
 
 def test_yaml_content_returns_content(valid_custom):

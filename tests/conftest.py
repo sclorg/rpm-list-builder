@@ -88,3 +88,27 @@ def generate_tmp_path_list(count: int):
         ]
 
         yield tmp_path_list
+
+
+# Fixtures
+
+@pytest.fixture
+def random_file_path():
+    """Provide path to a random temporary file."""
+
+    with generate_tmp_path() as path:
+        yield path
+
+
+@pytest.fixture
+def valid_recipe_path():
+    """Provide path to a valid recipe file."""
+
+    return Path('tests/fixtures/recipes/ror.yml')
+
+
+@pytest.fixture
+def valid_custom_file_path():
+    """Provide path to a valid custom file."""
+
+    return Path('tests/fixtures/custom/echo.yml')
