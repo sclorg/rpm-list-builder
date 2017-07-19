@@ -7,6 +7,8 @@ from unittest import mock
 import pytest
 
 from rpmlb.builder.base import MACRO_REGEX, BaseBuilder
+from rpmlb.recipe import Recipe
+from rpmlb.work import Work
 
 
 @pytest.fixture
@@ -54,13 +56,21 @@ def macro_spec_path(empty_spec_path, prepared_macros):
     return empty_spec_path
 
 
-def test_init():
-    builder = BaseBuilder()
+@pytest.fixture
+def builder(valid_recipe_path):
+    """Provide initialized BaseBuilder."""
+
+    recipe = Recipe(str(valid_recipe_path), 'rh-ror50')
+    work = Work(recipe)
+    builder = BaseBuilder(work)
+    return builder
+
+
+def test_init(builder):
     assert builder
 
 
-def test_run_calls_before_build_after():
-    builder = BaseBuilder()
+def test_run_calls_before_build_after(builder):
     builder.before = mock.MagicMock()
     builder.build = mock.MagicMock(return_value=True)
     builder.after = mock.MagicMock()
@@ -73,8 +83,7 @@ def test_run_calls_before_build_after():
     assert builder.after.called
 
 
-def test_run_returns_true_on_success():
-    builder = BaseBuilder()
+def test_run_returns_true_on_success(builder):
     builder.build = lambda *args, **kwargs: None
     builder.prepare = mock.MagicMock()
 
@@ -82,8 +91,7 @@ def test_run_returns_true_on_success():
     assert builder.run(mock_work)
 
 
-def test_run_exception():
-    builder = BaseBuilder()
+def test_run_exception(builder):
     builder.build = mock.Mock(side_effect=ValueError('test'))
     builder.prepare = mock.MagicMock()
 
@@ -114,8 +122,7 @@ def test_run_exception():
     builder.build.assert_has_calls(calls)
 
 
-def test_run_does_not_call_before_calls_build_after_with_resume_option():
-    builder = BaseBuilder()
+def test_run_does_not_call_before_calls_build_after_with_resume_option(builder):  # noqa: E501
     builder.before = mock.MagicMock()
     builder.build = mock.MagicMock(return_value=True)
     builder.after = mock.MagicMock()
@@ -214,7 +221,9 @@ def test_macros_are_replaced_correctly(macro_spec_path, prepared_macros):
         result_macros  # show the macro values when debugging
 
 
-def test_prepare_runs_all_preparations(macro_spec_path, prepared_macros):
+def test_prepare_runs_all_preparations(
+    builder, macro_spec_path, prepared_macros,
+):
     """All preparations are done as expected
 
     1. `replace_macros` are replaced
@@ -234,7 +243,6 @@ def test_prepare_runs_all_preparations(macro_spec_path, prepared_macros):
         ],
     }
 
-    builder = BaseBuilder()
     builder.prepare_extra_steps = mock.MagicMock(
         wraps=builder.prepare_extra_steps,
     )

@@ -1,7 +1,8 @@
 import logging
 
-from rpmlb import utils
-from rpmlb.builder.base import BaseBuilder
+from .. import utils
+from ..work import Work
+from .base import BaseBuilder
 
 LOG = logging.getLogger(__name__)
 
@@ -9,18 +10,28 @@ LOG = logging.getLogger(__name__)
 class MockBuilder(BaseBuilder):
     """A builder class for Mock."""
 
-    def before(self, work, **kwargs):
-        mock_config = kwargs['mock_config']
-        if not mock_config:
+    def __init__(self, work: Work, mock_config: str = None, **options):
+        """Initialize the builder.
+
+        Keyword arguments:
+            work: The overview of the work to do.
+            mock_config: Name of the Mock configuration profile to use.
+        """
+
+        super().__init__(work, mock_config=mock_config, **options)
+
+        if mock_config is None:
             raise ValueError('mock_config is required.')
 
-        utils.run_cmd('mock -r %s --scrub=all' % mock_config)
+        #: Name of the Mock configuration profile to use
+        self.mock_config = mock_config
+
+    def before(self, work, **kwargs):
+
+        utils.run_cmd('mock -r %s --scrub=all' % self.mock_config)
 
     def build(self, package_dict, **kwargs):
-        mock_config = kwargs['mock_config']
-        if not mock_config:
-            raise ValueError('mock_config is required.')
 
         utils.run_cmd('rm -v *.rpm', check=False)
         utils.run_cmd('rhpkg srpm')
-        utils.run_cmd('mock -r %s -n *.rpm' % mock_config)
+        utils.run_cmd('mock -r %s -n *.rpm' % self.mock_config)

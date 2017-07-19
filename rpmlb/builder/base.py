@@ -8,6 +8,7 @@ from typing import Any, Iterator, Mapping, Match
 import retrying
 
 from .. import utils
+from ..work import Work
 from ..yaml import Yaml
 
 LOG = logging.getLogger(__name__)
@@ -27,15 +28,22 @@ MACRO_REGEX = re.compile(
 class BaseBuilder:
     """A base class for the package builder."""
 
-    def __init__(self):
-        pass
+    def __init__(self, work: Work, **options):
+        """Initialize the builder to a valid state.
+
+        Keyword arguments:
+            work: Overview of the work to do.
+            options: Command line options for the builder to process.
+        """
 
     @staticmethod
-    def get_instance(name: str):
+    def get_instance(name: str, work: Work, **options):
         """Instantiate named builder.
 
         Keyword arguments:
             name: The name of the requested builder.
+            work: Overview of the work to do.
+            options: Command line options for the builder to process.
 
         Returns:
             Instance of the named builder.
@@ -45,7 +53,7 @@ class BaseBuilder:
             name,
             utils.camelize(name)
         )
-        instance = utils.get_instance(class_name)
+        instance = utils.get_instance(class_name, work, **options)
 
         LOG.debug('Loaded builder with %s', name)
         return instance
@@ -85,11 +93,28 @@ class BaseBuilder:
         self.after(work, **kwargs)
         return True
 
-    def before(self, work, **kwargs):
-        pass
+    def before(self, work: Work, **options):
+        """One-time build setup.
 
-    def after(self, work, **kwargs):
-        pass
+        This method is intended for setting up the whole build process,
+        and it is skipped when using the resume.
+        For preparation/initialization of the builder itself, use `__init__`.
+
+        Keyword arguments:
+            work: Overview of the work to do.
+            options: Command line option for the builder to process.
+        """
+
+    def after(self, work: Work, **options):
+        """Final build clean-up.
+
+        This method is intended for cleaning up after successful build,
+        and it is called once all the work is completed.
+
+        Keyword arguments:
+            work: Overview of the work that has been done.
+            options: Command line option for the builder to process.
+        """
 
     def prepare(self, package_dict: Mapping[str, Any]):
         """Prepare single package for a build.

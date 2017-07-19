@@ -90,12 +90,16 @@ def run(recipe_file, collection_id, **option_dict):
     recipe = Recipe(recipe_file, collection_id)
     recipe.verify()
 
-    builder = BaseBuilder.get_instance(option_dict['build'])
-    downloader = BaseDownloader.get_instance(option_dict['download'])
-
     # Prepare the working directory
     # HINT: with contextlib.closing(Work(recipe, **option_dict)) as work:
     work = Work(recipe, **option_dict)
+
+    builder = BaseBuilder.get_instance(
+        option_dict['build'],
+        work,
+        **option_dict
+    )
+    downloader = BaseDownloader.get_instance(option_dict['download'])
 
     # Download
     log.info('Downloading...')

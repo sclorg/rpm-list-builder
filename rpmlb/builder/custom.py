@@ -1,7 +1,8 @@
 import logging
 
-from rpmlb.builder.base import BaseBuilder
-from rpmlb.custom import Custom
+from ..custom import Custom
+from ..work import Work
+from .base import BaseBuilder
 
 LOG = logging.getLogger(__name__)
 
@@ -9,21 +10,24 @@ LOG = logging.getLogger(__name__)
 class CustomBuilder(BaseBuilder):
     """A custom builder class."""
 
-    def __init__(self):
-        self._yaml_content = None
+    def __init__(self, work: Work, custom_file: str = None, **options):
+        """Initialize the builder.
+
+        Keyword arguments:
+            work: The overview of the work to do.
+            custom_file: Path to the custom file.
+        """
+
+        super().__init__(work, custom_file=custom_file, **options)
+
+        if custom_file is None:
+            raise ValueError('custom_file is required.')
+
+        #: Custom commands runner to use
+        self.custom_runner = Custom(custom_file)
 
     def before(self, work, **kwargs):
-        custom_file = kwargs['custom_file']
-        if not custom_file:
-            raise ValueError('custom_file is required.')
-
-        custom = Custom(custom_file)
-        custom.run_cmds('before_build')
+        self.custom_runner.run_cmds('before_build')
 
     def build(self, package_dict, **kwargs):
-        custom_file = kwargs['custom_file']
-        if not custom_file:
-            raise ValueError('custom_file is required.')
-
-        custom = Custom(custom_file)
-        custom.run_cmds('build', **package_dict)
+        self.custom_runner.run_cmds('build', **package_dict)
