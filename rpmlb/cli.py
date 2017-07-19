@@ -32,7 +32,7 @@ from .work import Work
 )
 @click.option(
     '--build', '-b',
-    type=click.Choice('dummy mock copr custom'.split()),
+    type=click.Choice('dummy mock copr koji custom'.split()),
     default='dummy',
     help='Choose a build type.',
 )
@@ -72,6 +72,22 @@ from .work import Work
 @click.option(
     '--copr-repo', '-C', metavar='COPR_REPO',
     help='Target Copr for copr builder.',
+)
+@click.option(
+    '--koji-epel', metavar='VERSION', type=int, default=7,
+    help='Target EPEL version for koji builder.',
+)
+@click.option(
+    '--koji-profile', metavar='PROFILE',
+    help='Configuration profile for koji builder.',
+)
+@click.option(
+    '--koji-target-format', metavar='FORMAT',
+    help='Target format string for koji builder.',
+)
+@click.option(
+    '--koji-scratch', is_flag=True, default=False,
+    help='Make scratch builds with koji builder.',
 )
 # Positional arguments
 @click.argument(
