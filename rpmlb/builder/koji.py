@@ -21,13 +21,16 @@ class KojiBuilder(BaseBuilder):
         koji_scratch: bool = False,
         koji_epel: int = None,
         koji_target_format: str = DEFAULT_TARGET_FORMAT,
-        koji_profile: Optional[str] = None
+        koji_profile: Optional[str] = None,
+        **extra_options
     ):
         """Initialize the builder.
 
         Keyword arguments:
             work: Overview of the work to do.
-            epel: Version number of the EPEL to build for.
+            koji_scratch: Indicates if the --scratch build option
+                should be used.
+            koji_epel: Version number of the EPEL to build for.
             koji_target_format: Format string for the target to build into.
             koji_profile: Name of the configuration profile to use.
         """

@@ -113,6 +113,9 @@ def cli_parameters(target_format, epel, profile, scratch_build):
         'koji_profile': profile,
         'koji_target_format': target_format,
         'koji_scratch': scratch_build,
+
+        # Extra parameter to assure the builder can take them
+        'copr_repo': 'test/example',
     }
 
 
