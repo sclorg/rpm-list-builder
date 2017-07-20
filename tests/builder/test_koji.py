@@ -153,6 +153,18 @@ def test_base_command_respect_profile(builder, profile, expected_command):
     assert builder.base_command == expected_command
 
 
+def test_default_format_is_used(work, epel):
+    """Default format is used when no target format is specified."""
+
+    parameters = {
+        'koji_epel': epel,  # required
+        'koji_target_format': None,  # explicit None => should use default
+    }
+
+    builder = KojiBuilder(work, **parameters)
+    assert builder.target_format == KojiBuilder.DEFAULT_TARGET_FORMAT
+
+
 @pytest.mark.parametrize('collection', ['test', 'rh-ror50'])
 def test_target_respects_format(
     builder, target_format, collection, epel

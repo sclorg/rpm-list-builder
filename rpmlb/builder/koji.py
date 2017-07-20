@@ -20,7 +20,7 @@ class KojiBuilder(BaseBuilder):
         *,
         koji_scratch: bool = False,
         koji_epel: int = None,
-        koji_target_format: str = DEFAULT_TARGET_FORMAT,
+        koji_target_format: str = None,
         koji_profile: Optional[str] = None,
         **extra_options
     ):
@@ -46,7 +46,7 @@ class KojiBuilder(BaseBuilder):
         self.epel = koji_epel
 
         #: Format string for the build target
-        self.target_format = koji_target_format
+        self.target_format = koji_target_format or self.DEFAULT_TARGET_FORMAT
 
         #: The configuration profile to use
         self.profile = koji_profile
