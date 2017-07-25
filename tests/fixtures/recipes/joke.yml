@@ -1,0 +1,8 @@
+# Recipe for Joke
+---
+# This works on Fedora
+joke:
+  name: Joke
+  packages:
+    - sl
+    - fortune-mod
