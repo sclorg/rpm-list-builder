@@ -13,7 +13,7 @@ RUN "${DNF}" -y install \
     --setopt=install_weak_deps=false \
     --setopt=tsflags=nodocs \
     --setopt=deltarpm=0 \
-    rpm-build git "/usr/bin/${PYTHON}" ${EXTRA_PKGS} \
+    rpm-build scl-utils-build git "/usr/bin/${PYTHON}" ${EXTRA_PKGS} \
     && "${DNF}" clean all
 
 RUN "${PYTHON}" -m ensurepip \
