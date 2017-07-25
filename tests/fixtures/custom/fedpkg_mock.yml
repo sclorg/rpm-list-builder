@@ -1,0 +1,9 @@
+download:
+  - |
+    fedpkg co "${PKG}"
+before_build:
+  - mock -r fedora-rawhide-x86_64 --scrub=all
+build:
+  - "rm -v *.rpm || true"
+  - fedpkg srpm
+  - "mock -r fedora-rawhide-x86_64 -n *.rpm"
