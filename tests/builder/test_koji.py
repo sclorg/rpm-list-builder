@@ -1,5 +1,6 @@
 """Tests for the KojiBuilder"""
 
+from collections import namedtuple
 from itertools import zip_longest
 from logging import DEBUG
 from pathlib import Path
@@ -79,7 +80,7 @@ def work(valid_recipe_path, collection_id):
 def builder(work):
     """Provide minimal KojiBuilder instance."""
 
-    return KojiBuilder(work, koji_epel=7)
+    return KojiBuilder(work, koji_epel=7, koji_owner='test-owner')
 
 
 @pytest.fixture(params=[
@@ -120,6 +121,7 @@ def cli_parameters(target_format, epel, profile, scratch_build):
 
     return {
         'koji_epel': epel,
+        'koji_owner': 'test-owner',
         'koji_profile': profile,
         'koji_target_format': target_format,
         'koji_scratch': scratch_build,
@@ -136,12 +138,13 @@ def test_init_sets_attributes(work, cli_parameters):
 
     assert builder.collection == work._recipe._collection_id
     assert builder.epel == cli_parameters['koji_epel']
+    assert builder.owner == cli_parameters['koji_owner']
     assert builder.profile == cli_parameters['koji_profile']
     assert builder.target_format == cli_parameters['koji_target_format']
     assert builder.scratch_build == cli_parameters['koji_scratch']
 
 
-@pytest.mark.parametrize('required', ['koji_epel'])
+@pytest.mark.parametrize('required', ['koji_epel', 'koji_owner'])
 def test_init_checks_parameters(required, work, cli_parameters):
     """Ensure that required parameters are checked by __init__."""
 
@@ -167,7 +170,7 @@ def test_default_format_is_used(work, epel):
     """Default format is used when no target format is specified."""
 
     parameters = {
-        'koji_epel': epel,  # required
+        'koji_epel': epel, 'koji_owner': 'test-owner',  # required
         'koji_target_format': None,  # explicit None => should use default
     }
 
@@ -234,8 +237,8 @@ def test_prepare_adjusts_bootstrap_release(builder, minimal_spec_contents):
 
 
 @pytest.mark.parametrize('scratch,expected_commands', [
-    (True, ['koji build']),
-    (False, ['koji build', 'koji wait-repo'])
+    (True, ['koji add-pkg', 'koji build']),
+    (False, ['koji add-pkg', 'koji build', 'koji wait-repo']),
 ])
 def test_build_emit_correct_commands(
     monkeypatch, builder, scratch, expected_commands
@@ -255,8 +258,55 @@ def test_build_emit_correct_commands(
         lambda *_, **__: Path('test.src.rpm'),
     )
 
+    # Provide hardcoded destination tag
+    monkeypatch.setattr(KojiBuilder, '_destination_tag', 'test_tag_name')
+
     builder.scratch_build = scratch
     builder.build({'name': 'test'})
 
     command_pairs = zip_longest(commands, expected_commands)
     assert all(cmd.startswith(exp) for cmd, exp in command_pairs), commands
+
+
+def test_destination_tag_parsed_correctly(monkeypatch, builder):
+    """Assert that the destination tag is correctly extracted from output."""
+
+    # Simulate output of `koji list-targets`
+    raw_output = namedtuple('MockCommandOutput', ['stdout', 'stderr'])(
+        stderr=b'',
+        stdout=dedent('''\
+        Name                Buildroot           Destination
+        ----------------------------------------------------------
+        test-target         test-target-build   test-tag-candidate
+        ''').encode('utf-8')
+    )
+
+    monkeypatch.setattr(
+        'rpmlb.builder.koji.run_cmd_with_capture',
+        lambda *_, **__: raw_output,
+    )
+
+    builder.target_format = 'test-target'
+    assert builder._destination_tag == 'test-tag-candidate'
+
+
+def test_add_package_respects_owner(monkeypatch, builder):
+    """Assert that the owner is used by the _add_package method."""
+
+    commands = []
+    monkeypatch.setattr(
+        'rpmlb.builder.koji.run_cmd',
+        lambda cmd, **__: commands.append(cmd),
+    )
+    monkeypatch.setattr(
+        KojiBuilder, '_destination_tag', 'test-destination'
+    )
+
+    builder.owner = 'expected-owner'
+    builder._add_package(name='test')
+
+    assert len(commands) == 1
+
+    cmd, = commands
+    assert '--owner' in cmd
+    assert builder.owner in cmd

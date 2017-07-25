@@ -103,6 +103,10 @@ DIST_RE = re.compile('^(fc|el|centos)[0-9]*$')
     '--koji-scratch', is_flag=True, default=False,
     help='Make scratch builds with koji builder.',
 )
+@click.option(
+    '--koji-owner', metavar='OWNER',
+    help='Owner of packages added by koji builder.',
+)
 # Positional arguments
 @click.argument(
     'recipe_file',
