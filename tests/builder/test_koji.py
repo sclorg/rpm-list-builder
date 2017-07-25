@@ -18,7 +18,10 @@ def minimal_spec_contents():
     """Text contents of a minimal SPEC file."""
 
     return dedent('''\
-        Name:       test
+        %{?scl:%scl_package less}
+        %{!?scl:%global pkg_name %{name}}
+
+        Name:       %{?scl_prefix}test
         Version:    1.0
         Release:    1%{?dist}
         Summary:    Minimal spec for testing purposes
@@ -58,10 +61,17 @@ def minimal_spec_path(tmpdir, minimal_spec_contents):
 
 
 @pytest.fixture
-def work(valid_recipe_path):
+def collection_id():
+    """Testing collection identification"""
+
+    return 'rh-ror50'
+
+
+@pytest.fixture
+def work(valid_recipe_path, collection_id):
     """Provide Work instance."""
 
-    valid_recipe = Recipe(str(valid_recipe_path), 'rh-ror50')
+    valid_recipe = Recipe(str(valid_recipe_path), collection_id)
     return Work(valid_recipe)
 
 
@@ -179,18 +189,22 @@ def test_target_respects_format(
     assert builder.target == expected_target
 
 
-def test_make_srpm_creates_srpm(minimal_spec_path, epel):
+def test_make_srpm_creates_srpm(minimal_spec_path, collection_id, epel):
     """Ensure that make_srpm works as expected"""
 
     configure_logging(DEBUG)
 
-    name = minimal_spec_path.stem
-    expected_name = '{name}-1.0-1.el{epel}.src.rpm'.format(
-        name=name,
-        epel=epel,
+    arguments = {
+        'name': minimal_spec_path.stem,
+        'collection': collection_id,
+        'epel': epel,
+    }
+
+    expected_name = '{collection}-{name}-1.0-1.el{epel}.src.rpm'.format_map(
+        arguments
     )
 
-    srpm_path = KojiBuilder._make_srpm(name, epel)
+    srpm_path = KojiBuilder._make_srpm(**arguments)
 
     assert srpm_path.exists(), srpm_path
     assert srpm_path.name == expected_name
@@ -202,7 +216,7 @@ def test_missing_spec_is_reported(tmpdir):
     configure_logging(DEBUG)
 
     with tmpdir.as_cwd(), pytest.raises(FileNotFoundError):
-        KojiBuilder._make_srpm('test', epel=7)
+        KojiBuilder._make_srpm(name='test', collection='test', epel=7)
 
 
 def test_prepare_adjusts_bootstrap_release(builder, minimal_spec_contents):

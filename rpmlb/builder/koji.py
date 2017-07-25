@@ -116,16 +116,21 @@ class KojiBuilder(BaseBuilder):
     def build(self, package_dict, **kwargs):
         """Build a package using Koji instance"""
 
-        srpm_path = self._make_srpm(package_dict['name'], self.epel)
+        srpm_path = self._make_srpm(
+            name=package_dict['name'],
+            collection=self.collection,
+            epel=self.epel,
+        )
         self._submit_build(srpm_path)
         self._wait_for_repo()
 
     @staticmethod
-    def _make_srpm(name: str, epel: int) -> Path:
+    def _make_srpm(name: str, collection: str, epel: int) -> Path:
         """Create SRPM of the specified name in current directory.
 
         Keyword arguments:
             name: Name of the package to create.
+            collection: Name/identification of the package's collection.
             epel: The EPEL version to build for.
 
         Returns:
@@ -146,6 +151,8 @@ class KojiBuilder(BaseBuilder):
         ]
         # dist tag
         define_list.append('dist .el{epel}'.format(epel=epel))
+        # collection name – needed to generate prefixed package
+        define_list.append('scl {collection}'.format(collection=collection))
 
         # Assemble the command
         command = ['rpmbuild']
@@ -154,7 +161,10 @@ class KojiBuilder(BaseBuilder):
 
         run_cmd_with_capture(' '.join(command))
 
-        srpm_path, = cwd.glob('{name}-*.src.rpm'.format(name=name))
+        srpm_path, = cwd.glob('{collection}-{name}-*.src.rpm'.format(
+            collection=collection,
+            name=name,
+        ))
         return srpm_path
 
     def _submit_build(self, srpm_path: Path) -> None:
