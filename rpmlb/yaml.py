@@ -17,7 +17,7 @@ class Yaml:
         except ImportError:
             from yaml import Loader
         try:
-            with open(file_path, 'r') as stream:
+            with open(str(file_path), 'r') as stream:
                 self.content = yaml.load(stream, Loader=Loader)
         except FileNotFoundError as e:
             LOG.error('File not found: %s at %s', file_path, os.getcwd())
