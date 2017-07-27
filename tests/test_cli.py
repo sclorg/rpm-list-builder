@@ -113,12 +113,13 @@ def path_options(path_kind):
     return path, options
 
 
-def test_path_nonexistent(path_kind, recipe_arguments):
+def test_path_nonexistent(runner, path_kind, recipe_arguments):
     path, options = path_options(path_kind)
 
-    with pytest.raises(click.BadParameter):
-        run.make_context('test-{}-nonexistent'.format(path_kind),
-                         options + recipe_arguments)
+    result = runner.invoke(run, options + recipe_arguments,
+                           standalone_mode=False)
+    assert result.exception is not None
+    assert isinstance(result.exception, click.BadParameter)
 
 
 def test_path_expected_and_absolute(path_kind, recipe_arguments):
@@ -129,14 +130,14 @@ def test_path_expected_and_absolute(path_kind, recipe_arguments):
     else:
         path.touch(mode=0o600)
 
-    ctx = run.make_context('test-{}-ok'.format(path_kind),
-                           options + recipe_arguments)
-    result = Path(ctx.params[path_kind.replace('-', '_')])
+    with run.make_context('test-{}-ok'.format(path_kind),
+                          options + recipe_arguments) as ctx:
+        result = Path(ctx.params[path_kind.replace('-', '_')])
     assert result == path
     assert result.is_absolute()
 
 
-def test_path_bad_permissions(path_kind, recipe_arguments):
+def test_path_bad_permissions(runner, path_kind, recipe_arguments):
     path, options = path_options(path_kind)
 
     if path_kind.endswith('directory'):
@@ -147,27 +148,29 @@ def test_path_bad_permissions(path_kind, recipe_arguments):
         # unreadable file
         path.touch(mode=0o200)
 
-    with pytest.raises(click.BadParameter):
-        run.make_context('test-{}-bad-permissions'.format(path_kind),
-                         options + recipe_arguments)
+    result = runner.invoke(run, options + recipe_arguments,
+                           standalone_mode=False)
+    assert result.exception is not None
+    assert isinstance(result.exception, click.BadParameter)
 
 
 def test_resume_conversion(recipe_arguments):
     """Resume is converted into integer value."""
 
     options = ['--resume', '42']
-    ctx = run.make_context('test-resume-conversion',
-                           options + recipe_arguments)
+    with run.make_context('test-resume-conversion',
+                          options + recipe_arguments) as ctx:
+        assert isinstance(ctx.params['resume'], int)
 
-    assert isinstance(ctx.params['resume'], int)
 
-
-def test_invalid_resume(recipe_arguments):
+def test_invalid_resume(runner, recipe_arguments):
 
     options = ['--resume', 'start']
 
-    with pytest.raises(click.BadParameter):
-        run.make_context('test-resume-error', options + recipe_arguments)
+    result = runner.invoke(run, options + recipe_arguments,
+                           standalone_mode=False)
+    assert result.exception is not None
+    assert isinstance(result.exception, click.BadParameter)
 
 
 @pytest.mark.parametrize('option,value', [
@@ -179,10 +182,10 @@ def test_simple_options(recipe_arguments, option, value):
     """Specific option values are passed unprocessed."""
 
     options = ['--' + option, value]
-    ctx = run.make_context('test-{}-passing'.format(option),
-                           options + recipe_arguments)
+    with run.make_context('test-{}-passing'.format(option),
+                          options + recipe_arguments) as ctx:
 
-    assert ctx.params[option.replace('-', '_')] == value
+        assert ctx.params[option.replace('-', '_')] == value
 
 
 @pytest.mark.parametrize('help_switch', ['--help', '-h'])
