@@ -196,7 +196,8 @@ work_directory/
   * `before_download`: Write commands to run before build.
   * `download`: Write commands to run for each packages in the pacakges directory. You can use environment variable `PKG` to describe the package name.
 
-
+For both hooks, the environment variable `CUSTOM_DIR` refers to the directory containing the custom file
+(allowing configuration files and helper scripts to be located relative to it).
 
 ### Specify work directory
 
@@ -258,6 +259,9 @@ work_directory/
 
   * `before_build`: Write commands to run before build.
   * `build`: Write commands to run for each packages in the pacakges directory. You can use environment variable `PKG` to describe the package name.
+
+For both hooks, the environment variable `CUSTOM_DIR` refers to the directory containing the custom file
+(allowing configuration files and helper scripts to be located relative to it).
 
 #### Don't build
 

@@ -1,0 +1,8 @@
+# Example recipe designed solely for use with the custom echo backend
+---
+echo-packages:
+  name: Echo Packages
+  packages:
+    - a-package
+    - another-package
+    - a-package # Deliberately repeated

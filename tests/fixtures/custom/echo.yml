@@ -1,19 +1,26 @@
 before_download:
   - echo "This command is run before download."
-  - pwd
+  - |
+    echo "Using hook dir: ${CUSTOM_DIR}"
+    echo "Running hook in:" $(pwd)
 download:
   - echo "This command is run for each package download."
   - |
+    echo "Using hook dir: ${CUSTOM_DIR}"
+    echo "Running hook in:" $(pwd)
     echo "Downloading PKG: ${PKG}"
     if [ "${PKG}" != "" ]; then
         mkdir "${PKG}"
         touch "${PKG}/${PKG}.spec"
     fi
-  - pwd
 before_build:
   - echo "This command is run before build."
-  - pwd
+  - |
+    echo "Using hook dir: ${CUSTOM_DIR}"
+    echo "Running hook in:" $(pwd)
 build:
   - echo "This command is run for each package build."
-  - "echo Building PKG: ${PKG}"
-  - pwd
+  - |
+    echo "Using hook dir: ${CUSTOM_DIR}"
+    echo "Running hook in:" $(pwd)
+    echo "Building PKG: ${PKG}"
