@@ -154,6 +154,23 @@ def test_path_bad_permissions(runner, path_kind, recipe_arguments):
     assert isinstance(result.exception, click.BadParameter)
 
 
+@pytest.mark.parametrize('valid_dist',
+                         ('fc', 'fc26', 'el', 'el7', 'centos', 'centos7'))
+def test_dist_returns_value_on_valid_options(recipe_arguments, valid_dist):
+    options = ['--dist', valid_dist]
+    with run.make_context('test_dist_returns_value_on_valid_options',
+                          options + recipe_arguments) as ctx:
+        assert isinstance(ctx.params['dist'], str)
+
+
+def test_dist_raises_error_on_invalid_value(runner, recipe_arguments):
+    options = ['--dist', 'fedora']
+    result = runner.invoke(run, options + recipe_arguments,
+                           standalone_mode=False)
+    assert result.exception is not None
+    assert isinstance(result.exception, click.BadParameter)
+
+
 def test_resume_conversion(recipe_arguments):
     """Resume is converted into integer value."""
 

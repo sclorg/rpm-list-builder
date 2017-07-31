@@ -60,9 +60,6 @@ class BaseBuilder:
 
     def run(self, work, **kwargs):
         is_resume = kwargs.get('resume', False)
-        resume_num = 0
-        if is_resume:
-            resume_num = kwargs['resume']
 
         if is_resume:
             message = (
@@ -75,12 +72,11 @@ class BaseBuilder:
 
         for package_dict, num_name in work.each_package_dir():
             try:
-                if is_resume:
-                    num = int(num_name)
-                    if num < resume_num:
-                        continue
+                if self._is_build_skipped(package_dict, num_name,
+                                          is_resume, **kwargs):
+                    continue
 
-                self.prepare(package_dict)
+                self.prepare(package_dict, **kwargs)
                 self.build_with_retrying(package_dict, **kwargs)
             except Exception:
                 message = 'pacakge_dict: {0}, num: {1}, work_dir: {2}'.format(
@@ -116,11 +112,12 @@ class BaseBuilder:
             options: Command line option for the builder to process.
         """
 
-    def prepare(self, package_dict: Mapping[str, Any]):
+    def prepare(self, package_dict: Mapping[str, Any], **options):
         """Prepare single package for a build.
 
         Keyword arguments:
             package_dict: A dictionary of package metadata.
+            options: Command line option for the builder to process.
         """
 
         if 'name' not in package_dict:
@@ -152,7 +149,11 @@ class BaseBuilder:
             target_file.write(''.join(content_stream))  # End modifications
 
         if 'cmd' in package_dict:
-            Yaml.run_cmd_element(package_dict['cmd'])
+            env = {}
+            dist = options.get('dist')
+            if dist:
+                env['DIST'] = dist
+            Yaml.run_cmd_element(package_dict['cmd'], env=env)
 
     @retrying.retry(stop_max_attempt_number=3)
     def build_with_retrying(self, package_dict, **kwargs):
@@ -261,3 +262,37 @@ class BaseBuilder:
         """
 
         yield from source  # pass for generators
+
+    def _is_build_skipped(self, package_dict: dict, num_name: str,
+                          is_resume: bool, **kwargs):
+        """Return if skip a build for a pacakge.
+
+        Override if needed.
+
+        Keyword arguments:
+            package_dict: A dictionary of package metadata.
+            num_name: A package's order number string.
+            is_redume: if redume or not.
+            kwargs: option arguments.
+        """
+
+        if not package_dict:
+            raise ValueError('package_dict is required.')
+        if not num_name:
+            raise ValueError('num_name is required.')
+
+        resume_num = 0
+        if is_resume:
+            resume_num = kwargs['resume']
+        dist = kwargs.get('dist')
+
+        is_skipped = False
+        if is_resume:
+            num = int(num_name)
+            if num < resume_num:
+                is_skipped = True
+        elif dist and 'dist' in package_dict:
+            pattern = re.compile(package_dict['dist'])
+            if not pattern.match(dist):
+                is_skipped = True
+        return is_skipped

@@ -1,4 +1,6 @@
 import logging
+import os
+import re
 
 from .. import utils
 
@@ -44,6 +46,14 @@ class BaseDownloader:
         self.before(work, **kwargs)
 
         for package_dict, num_name in work.each_num_dir():
+            if self._is_download_skipped(package_dict, **kwargs):
+                name = package_dict['name']
+                LOG.debug('Skip download package: %s', name)
+                # Create package directory for build process.
+                if not os.path.isdir(name):
+                    os.mkdir(name)
+                continue
+
             # TODO(Run it with asynchronous)
             self.download(package_dict, **kwargs)
 
@@ -58,3 +68,24 @@ class BaseDownloader:
 
     def download(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')
+
+    def _is_download_skipped(self, package_dict: dict, **kwargs):
+        """Return if skip a download for a pacakge.
+
+        Override if needed.
+
+        Keyword arguments:
+            package_dict: A dictionary of package metadata.
+            kwargs: option arguments.
+        """
+
+        if not package_dict:
+            raise ValueError('package_dict is required.')
+
+        is_skipped = False
+
+        dist = kwargs.get('dist')
+        if dist and 'dist' in package_dict:
+            if not re.match(package_dict['dist'], dist):
+                is_skipped = True
+        return is_skipped

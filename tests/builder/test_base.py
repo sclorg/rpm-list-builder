@@ -52,6 +52,7 @@ def macro_spec_path(empty_spec_path, prepared_macros):
 
         print('BuildRequires foo', file=out_file)
         print('BuildRequires bar', file=out_file)
+        print('BuildRequires dist', file=out_file)
 
     return empty_spec_path
 
@@ -240,6 +241,10 @@ def test_prepare_runs_all_preparations(
         'cmd': [
             'sed -i "/^BuildRequires foo$/ s/^/#/" {0}'.format(spec_file_name),
             'sed -i "/^BuildRequires bar$/ s/^/#/" {0}'.format(spec_file_name),
+            r'''if [[ "${{DIST}}" =~ centos ]]; then
+                 sed -i "/^BuildRequires dist$/ s/dist/${{DIST}}/" {0}
+             fi
+            '''.format(spec_file_name),
         ],
     }
 
@@ -247,7 +252,7 @@ def test_prepare_runs_all_preparations(
         wraps=builder.prepare_extra_steps,
     )
 
-    builder.prepare(package_metadata)
+    builder.prepare(package_metadata, dist='centos7')
 
     with macro_spec_path.open() as spec_file:
         spec_contents = spec_file.read()
@@ -267,3 +272,49 @@ def test_prepare_runs_all_preparations(
                      spec_contents, flags=re.MULTILINE)
     assert re.search('^#BuildRequires bar$',
                      spec_contents, flags=re.MULTILINE)
+    assert re.search('^BuildRequires centos7$',
+                     spec_contents, flags=re.MULTILINE)
+
+
+def test_is_build_skipped_raises_error_when_package_dict_is_none(builder):
+    package_dict = None
+    num_name = '1'
+    is_redume = False
+    with pytest.raises(ValueError):
+        builder._is_build_skipped(package_dict, num_name, is_redume)
+
+
+def test_is_build_skipped_raises_error_when_num_name_is_none(builder):
+    package_dict = {'name': 'a'}
+    num_name = None
+    is_redume = False
+    with pytest.raises(ValueError):
+        builder._is_build_skipped(package_dict, num_name, is_redume)
+
+
+def test_is_build_skipped_returns_false_on_matched_dist(builder):
+    package_dict = {
+        'name': 'a',
+        'dist': 'fc2[56]',
+    }
+    num_name = '1'
+    is_redume = False
+    kwargs = {
+        'dist': 'fc26',
+    }
+    assert not builder._is_build_skipped(
+        package_dict, num_name, is_redume, **kwargs)
+
+
+def test_is_build_skipped_returns_true_on_unmatched_dist(builder):
+    package_dict = {
+        'name': 'a',
+        'dist': 'fc2[56]',
+    }
+    num_name = '1'
+    is_redume = False
+    kwargs = {
+        'dist': 'fc2',
+    }
+    assert builder._is_build_skipped(
+        package_dict, num_name, is_redume, **kwargs)
