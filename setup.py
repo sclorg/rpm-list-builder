@@ -1,10 +1,15 @@
 import setuptools
 
+with open('README.rst') as f:
+    readme = f.read().strip()
+
+
 setuptools.setup(
     name='rpmlb',
     license='GPLv2+',
     use_scm_version=True,
     description='Software Collection Rebuild Helper',
+    long_description=readme,
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
     url='https://github.com/sclorg/rpm-list-builder',
