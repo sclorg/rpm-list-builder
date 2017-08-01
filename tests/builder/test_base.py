@@ -63,12 +63,19 @@ def builder(valid_recipe_path):
 
     recipe = Recipe(str(valid_recipe_path), 'rh-ror50')
     work = Work(recipe)
-    builder = BaseBuilder(work)
+    builder = BaseBuilder(work, pkg_cmd='testpkg')
     return builder
 
 
 def test_init(builder):
     assert builder
+
+
+def test_init_raises_error_without_pkg_cmd_option(valid_recipe_path):
+    recipe = Recipe(str(valid_recipe_path), 'rh-ror50')
+    work = Work(recipe)
+    with pytest.raises(ValueError):
+        BaseBuilder(work)
 
 
 def test_run_calls_before_build_after(builder):

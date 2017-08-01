@@ -9,7 +9,7 @@ import click
 import pytest
 from click.testing import CliRunner
 
-from rpmlb.cli import run
+from rpmlb import cli
 
 
 @pytest.fixture
@@ -54,7 +54,8 @@ def recipe_arguments(recipe_path):
 
 
 @pytest.mark.parametrize('option', ('recipe_file', 'collection_id', 'build',
-                                    'download', 'branch', 'source_directory'))
+                                    'download', 'branch', 'source_directory',
+                                    'pkg_cmd'))
 def test_parse_argv_no_options(tmpdir, option):
     """Tests proper default values of the CLI"""
 
@@ -73,14 +74,15 @@ def test_parse_argv_no_options(tmpdir, option):
         'download': 'none',
         'branch': None,
         'source_directory': current_dir,
+        'pkg_cmd': None,
     }
 
     # Parse the arguments
     with tmpdir.as_cwd():
         argv = list(map(str, [recipe_file, collection_id]))
-        args = run.make_context('rpmlb', argv).params
+        args = cli.run.make_context('rpmlb', argv).params
 
-    assert args[option] == expected[option]
+        assert args[option] == expected[option]
 
 
 @pytest.mark.parametrize('verbose', (True, False))
@@ -90,7 +92,7 @@ def test_log_verbosity(root_logger, runner, verbose, recipe_arguments):
     verbose_args = ['--verbose'] if verbose else []
     level = logging.DEBUG if verbose else logging.INFO
 
-    runner.invoke(run, verbose_args + recipe_arguments)
+    runner.invoke(cli.run, verbose_args + recipe_arguments)
     assert root_logger.getEffectiveLevel() == level
 
 
@@ -116,7 +118,7 @@ def path_options(path_kind):
 def test_path_nonexistent(runner, path_kind, recipe_arguments):
     path, options = path_options(path_kind)
 
-    result = runner.invoke(run, options + recipe_arguments,
+    result = runner.invoke(cli.run, options + recipe_arguments,
                            standalone_mode=False)
     assert result.exception is not None
     assert isinstance(result.exception, click.BadParameter)
@@ -130,8 +132,8 @@ def test_path_expected_and_absolute(path_kind, recipe_arguments):
     else:
         path.touch(mode=0o600)
 
-    with run.make_context('test-{}-ok'.format(path_kind),
-                          options + recipe_arguments) as ctx:
+    with cli.run.make_context('test-{}-ok'.format(path_kind),
+                              options + recipe_arguments) as ctx:
         result = Path(ctx.params[path_kind.replace('-', '_')])
     assert result == path
     assert result.is_absolute()
@@ -148,7 +150,23 @@ def test_path_bad_permissions(runner, path_kind, recipe_arguments):
         # unreadable file
         path.touch(mode=0o200)
 
-    result = runner.invoke(run, options + recipe_arguments,
+    result = runner.invoke(cli.run, options + recipe_arguments,
+                           standalone_mode=False)
+    assert result.exception is not None
+    assert isinstance(result.exception, click.BadParameter)
+
+
+@pytest.mark.parametrize('pkg_cmd', ('fedpkg', 'rhpkg'))
+def test_pkg_cmd_returns_valid_value(recipe_arguments, pkg_cmd):
+    options = ['--pkg-cmd', pkg_cmd]
+    with cli.run.make_context('test_pkg_cmd_{}_returns_value'.format(pkg_cmd),
+                              options + recipe_arguments) as ctx:
+        assert ctx.params['pkg_cmd'] == pkg_cmd
+
+
+def test_pkg_cmd_raises_error_on_invalid_options(runner, recipe_arguments):
+    options = ['--pkg-cmd', 'foo']
+    result = runner.invoke(cli.run, options + recipe_arguments,
                            standalone_mode=False)
     assert result.exception is not None
     assert isinstance(result.exception, click.BadParameter)
@@ -158,14 +176,14 @@ def test_path_bad_permissions(runner, path_kind, recipe_arguments):
                          ('fc', 'fc26', 'el', 'el7', 'centos', 'centos7'))
 def test_dist_returns_value_on_valid_options(recipe_arguments, valid_dist):
     options = ['--dist', valid_dist]
-    with run.make_context('test_dist_returns_value_on_valid_options',
-                          options + recipe_arguments) as ctx:
+    with cli.run.make_context('test_dist_returns_value_on_valid_options',
+                              options + recipe_arguments) as ctx:
         assert isinstance(ctx.params['dist'], str)
 
 
 def test_dist_raises_error_on_invalid_value(runner, recipe_arguments):
     options = ['--dist', 'fedora']
-    result = runner.invoke(run, options + recipe_arguments,
+    result = runner.invoke(cli.run, options + recipe_arguments,
                            standalone_mode=False)
     assert result.exception is not None
     assert isinstance(result.exception, click.BadParameter)
@@ -175,8 +193,8 @@ def test_resume_conversion(recipe_arguments):
     """Resume is converted into integer value."""
 
     options = ['--resume', '42']
-    with run.make_context('test-resume-conversion',
-                          options + recipe_arguments) as ctx:
+    with cli.run.make_context('test-resume-conversion',
+                              options + recipe_arguments) as ctx:
         assert isinstance(ctx.params['resume'], int)
 
 
@@ -184,7 +202,7 @@ def test_invalid_resume(runner, recipe_arguments):
 
     options = ['--resume', 'start']
 
-    result = runner.invoke(run, options + recipe_arguments,
+    result = runner.invoke(cli.run, options + recipe_arguments,
                            standalone_mode=False)
     assert result.exception is not None
     assert isinstance(result.exception, click.BadParameter)
@@ -199,8 +217,8 @@ def test_simple_options(recipe_arguments, option, value):
     """Specific option values are passed unprocessed."""
 
     options = ['--' + option, value]
-    with run.make_context('test-{}-passing'.format(option),
-                          options + recipe_arguments) as ctx:
+    with cli.run.make_context('test-{}-passing'.format(option),
+                              options + recipe_arguments) as ctx:
 
         assert ctx.params[option.replace('-', '_')] == value
 
@@ -211,7 +229,7 @@ def test_help_option_variants(runner, help_switch, recipe_arguments):
 
     # NOTE: recipe_arguments are necessary, both run.make_context and
     # runner.invoke break without them for some reason
-    result = runner.invoke(run, [help_switch] + recipe_arguments)
+    result = runner.invoke(cli.run, [help_switch] + recipe_arguments)
 
     assert result.exit_code == 0, result.output
 
@@ -219,9 +237,41 @@ def test_help_option_variants(runner, help_switch, recipe_arguments):
 @pytest.mark.parametrize('version_switch', ['--version'])
 def test_version_option(runner, version_switch):
     """Test that --version option displays the version"""
-    result = runner.invoke(run, [version_switch])
+    result = runner.invoke(cli.run, [version_switch])
     out = result.output.strip()
 
     assert result.exit_code == 0
     assert len(out.split('\n')) == 1
     assert 'version' in out
+
+
+def test_choose_pkg_cmd_does_not_set(recipe_arguments):
+    option_dict = {
+        'pkg_cmd': 'testpkg',
+    }
+    cli._choose_pkg_cmd(option_dict)
+    assert option_dict['pkg_cmd'] == 'testpkg'
+
+
+def test_choose_pkg_cmd_sets_default_value(recipe_arguments):
+    option_dict = {
+        'pkg_cmd': None,
+    }
+    cli._choose_pkg_cmd(option_dict)
+    assert option_dict['pkg_cmd'] == 'fedpkg'
+
+
+@pytest.mark.parametrize('download_type', ('fedpkg', 'rhpkg'))
+def test_choose_pkg_cmd_sets_download_type(recipe_arguments,
+                                           download_type):
+    option_dict = {
+        'download': download_type,
+        'pkg_cmd': None,
+    }
+    cli._choose_pkg_cmd(option_dict)
+    assert option_dict['pkg_cmd'] == download_type
+
+
+def test_choose_pkg_cmd_returns_optoin_dict_is_none():
+    cli._choose_pkg_cmd(None)
+    assert True

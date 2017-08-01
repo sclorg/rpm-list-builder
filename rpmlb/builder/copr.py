@@ -27,7 +27,6 @@ class CoprBuilder(BaseBuilder):
         self.copr_repo = copr_repo
 
     def build(self, package_dict, **kwargs):
-
         utils.run_cmd('rm -v *.rpm', check=False)
-        utils.run_cmd('rhpkg srpm')
-        utils.run_cmd('copr-cli build %s *.rpm' % self.copr_repo)
+        utils.run_cmd('{} srpm'.format(self._pkg_cmd))
+        utils.run_cmd('copr-cli build {} *.rpm'.format(self.copr_repo))

@@ -35,6 +35,9 @@ class BaseBuilder:
             work: Overview of the work to do.
             options: Command line options for the builder to process.
         """
+        if 'pkg_cmd' not in options:
+            raise ValueError('pkg_cmd is required.')
+        self._pkg_cmd = options['pkg_cmd']
 
     @staticmethod
     def get_instance(name: str, work: Work, **options):

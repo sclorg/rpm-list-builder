@@ -27,11 +27,9 @@ class MockBuilder(BaseBuilder):
         self.mock_config = mock_config
 
     def before(self, work, **kwargs):
-
-        utils.run_cmd('mock -r %s --scrub=all' % self.mock_config)
+        utils.run_cmd('mock -r {} --scrub=all'.format(self.mock_config))
 
     def build(self, package_dict, **kwargs):
-
         utils.run_cmd('rm -v *.rpm', check=False)
-        utils.run_cmd('rhpkg srpm')
-        utils.run_cmd('mock -r %s -n *.rpm' % self.mock_config)
+        utils.run_cmd('{} srpm'.format(self._pkg_cmd))
+        utils.run_cmd('mock -r {} -n *.rpm'.format(self.mock_config))
