@@ -180,7 +180,12 @@ class KojiBuilder(BaseBuilder):
 
         run_cmd_with_capture(' '.join(command))
 
-        srpm_path, = cwd.glob('{collection}-{name}-*.src.rpm'.format(
+        if name == collection:  # metapackage build
+            glob_format = '{collection}-*.src.rpm'
+        else:
+            glob_format = '{collection}-{name}-*.src.rpm'
+
+        srpm_path, = cwd.glob(glob_format.format(
             collection=collection,
             name=name,
         ))

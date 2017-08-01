@@ -1,5 +1,6 @@
 """Tests for the KojiBuilder"""
 
+import shutil
 from collections import namedtuple
 from itertools import zip_longest
 from logging import DEBUG
@@ -14,51 +15,35 @@ from rpmlb.recipe import Recipe
 from rpmlb.work import Work
 
 
-@pytest.fixture
-def minimal_spec_contents():
-    """Text contents of a minimal SPEC file."""
+@pytest.fixture(
+    params=[
+        ('tests/fixtures/specfiles/minimal.spec', 'test.spec'),
+        ('tests/fixtures/specfiles/metapackage.spec', 'rh-ror50.spec'),
+    ],
+    ids=[
+        'minimal',
+        'metapackage'
+    ],
+)
+def spec_path(request, tmpdir):
+    """Provide a SPEC file path according to parameter."""
 
-    return dedent('''\
-        %{?scl:%scl_package less}
-        %{!?scl:%global pkg_name %{name}}
+    # Copy the SPEc to temporary directory
+    source = Path(request.param[0])
+    target = Path(str(tmpdir), request.param[1])
 
-        Name:       %{?scl_prefix}test
-        Version:    1.0
-        Release:    1%{?dist}
-        Summary:    Minimal spec for testing purposes
-
-        Group:      Development/Testing
-        License:    MIT
-        URL:        http://test.example.com
-
-        %description
-        A minimal SPEC file for testing of RPM packaging.
-
-        %prep
-
-        %build
-
-        %install
-
-        %files
-
-        %changelog
-        * Thu Jun 22 2017 Jan Stanek <jstanek@redhat.com> 1.0-1
-        - Initial package
-    ''')
-
-
-@pytest.fixture
-def minimal_spec_path(tmpdir, minimal_spec_contents):
-    """Provide a minimal SPEC file in temporary directory."""
+    shutil.copyfile(str(source), str(target))  # no support for pathlib :(
 
     with tmpdir.as_cwd():
-        path = Path('test.spec')
+        yield target
 
-        with path.open(mode='w', encoding='utf-8') as spec_file:
-            spec_file.write(minimal_spec_contents)
 
-        yield path
+@pytest.fixture
+def spec_contents(spec_path):
+    """Provide text contents of a minimal spec file"""
+
+    with spec_path.open() as istream:
+        return istream.read()
 
 
 @pytest.fixture
@@ -192,25 +177,28 @@ def test_target_respects_format(
     assert builder.target == expected_target
 
 
-def test_make_srpm_creates_srpm(minimal_spec_path, collection_id, epel):
+def test_make_srpm_creates_srpm(spec_path, collection_id, epel):
     """Ensure that make_srpm works as expected"""
 
     configure_logging(DEBUG)
 
     arguments = {
-        'name': minimal_spec_path.stem,
+        'name': spec_path.stem,
         'collection': collection_id,
         'epel': epel,
     }
 
-    expected_name = '{collection}-{name}-1.0-1.el{epel}.src.rpm'.format_map(
-        arguments
-    )
+    possible_names = {
+        # Metapackage
+        '{collection}-1-1.el{epel}.src.rpm'.format_map(arguments),
+        # Regular package
+        '{collection}-{name}-1.0-1.el{epel}.src.rpm'.format_map(arguments),
+    }
 
     srpm_path = KojiBuilder._make_srpm(**arguments)
 
     assert srpm_path.exists(), srpm_path
-    assert srpm_path.name == expected_name
+    assert srpm_path.name in possible_names
 
 
 def test_missing_spec_is_reported(tmpdir):
@@ -222,10 +210,10 @@ def test_missing_spec_is_reported(tmpdir):
         KojiBuilder._make_srpm(name='test', collection='test', epel=7)
 
 
-def test_prepare_adjusts_bootstrap_release(builder, minimal_spec_contents):
+def test_prepare_adjusts_bootstrap_release(builder, spec_contents):
     """Release is adjusted on bootstrap build."""
 
-    lines = minimal_spec_contents.splitlines(keepends=True)
+    lines = spec_contents.splitlines(keepends=True)
     lines = builder.prepare_extra_steps(lines, {
         'name': 'test',
         'bootstrap_position': 1,
