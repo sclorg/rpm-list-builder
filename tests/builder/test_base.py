@@ -109,7 +109,7 @@ def test_run_exception(builder):
     called = False
     error_message = None
     try:
-        builder.run(mock_work)
+        builder.run(mock_work, retry=3)
     except RuntimeError as e:
         called = True
         error_message = str(e)
@@ -122,12 +122,9 @@ def test_run_exception(builder):
     if sys.version_info >= (3, 6):
         builder.build.assert_called()
     # bulid should be called 3 times for retry setting.
-    calls = [
-        mock.call({'name': 'a'}),
-        mock.call({'name': 'a'}),
-        mock.call({'name': 'a'}),
-    ]
+    calls = [mock.call({'name': 'a'}, retry=3)] * 4
     builder.build.assert_has_calls(calls)
+    assert builder.build.call_count == len(calls)
 
 
 def test_run_does_not_call_before_calls_build_after_with_resume_option(builder):  # noqa: E501

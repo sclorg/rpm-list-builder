@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator, Mapping, Match
 
-import retrying
+from retry.api import retry_call
 
 from .. import utils
 from ..work import Work
@@ -80,7 +80,14 @@ class BaseBuilder:
                     continue
 
                 self.prepare(package_dict, **kwargs)
-                self.build_with_retrying(package_dict, **kwargs)
+
+                # Repeat the call in case of failure
+                retry_count = kwargs.get('retry', 0)
+                retry_call(
+                    self.build, fargs=(package_dict,), fkwargs=kwargs,
+                    tries=retry_count+1,  # 0 tries == no call
+                )
+
             except Exception:
                 message = 'pacakge_dict: {0}, num: {1}, work_dir: {2}'.format(
                     package_dict, num_name, work.working_dir)
@@ -157,10 +164,6 @@ class BaseBuilder:
             if dist:
                 env['DIST'] = dist
             Yaml.run_cmd_element(package_dict['cmd'], env=env)
-
-    @retrying.retry(stop_max_attempt_number=3)
-    def build_with_retrying(self, package_dict, **kwargs):
-        self.build(package_dict, **kwargs)
 
     def build(self, package_dict, **kwargs):
         raise NotImplementedError('Implement this method.')

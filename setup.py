@@ -20,7 +20,7 @@ setuptools.setup(
     ],
     install_requires=[
         'PyYAML',
-        'retrying',
+        'retry',
         'click',
         'typing;python_version<"3.5"',
     ],

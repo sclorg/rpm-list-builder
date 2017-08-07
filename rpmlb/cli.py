@@ -75,6 +75,11 @@ DIST_RE = re.compile('^(fc|el|centos)[0-9]*$')
     help='Resume build from specified position.',
 )
 @click.option(
+    '--retry', metavar='RETRY_COUNT',
+    type=click.IntRange(min=0), default=0,  # no negatives
+    help='Retry failed build RETRY_COUNT times before aborting.',
+)
+@click.option(
     '--pkg-cmd',
     type=click.Choice('fedpkg rhpkg'.split()),
     help='Choose a package command.',

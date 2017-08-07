@@ -2,6 +2,7 @@
 
 import logging
 import os
+from contextlib import ExitStack
 from pathlib import Path
 from textwrap import dedent
 
@@ -275,3 +276,25 @@ def test_choose_pkg_cmd_sets_download_type(recipe_arguments,
 def test_choose_pkg_cmd_returns_optoin_dict_is_none():
     cli._choose_pkg_cmd(None)
     assert True
+
+
+@pytest.mark.parametrize('value,exception_type', [
+    (1, None),
+    (1000, None),
+    (-1, click.BadParameter),
+])
+def test_retry_sets_num_of_retries(value, exception_type, recipe_arguments):
+    """Ensure proper handling of retry parameter."""
+
+    options = ['--retry', str(value)]
+
+    with ExitStack() as contexts:
+        if exception_type:
+            contexts.enter_context(pytest.raises(exception_type))
+
+        ctx = contexts.enter_context(cli.run.make_context(
+            'test-retry[{}]'.format(value),
+            options + recipe_arguments,
+        ))
+
+        assert ctx.params['retry'] == value
