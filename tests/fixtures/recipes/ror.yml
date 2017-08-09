@@ -1,19 +1,6 @@
 # Recipe for Ruby on Rails collections
 ---
 rh-ror50:
-  name: Ruby on Rails 5.0
-  requires: [rh-ruby23, rh-nodejs4, rh-mongodb32]
   packages:
-    - rh-ror50:
-        install:
-          - bash
-          - bzip2
+    - rh-ror50
     - rubygem-arel
-
-# RSpec
-# Cucumber
-# Rails (needed)
-# Rails (optional)
-# MongoDB (Special request)
-
-

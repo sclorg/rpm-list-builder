@@ -3,6 +3,8 @@ from collections import Counter
 from itertools import starmap
 from typing import Iterator, Mapping, Union
 
+import click
+
 from rpmlb.yaml import Yaml
 
 LOG = logging.getLogger(__name__)
@@ -10,6 +12,17 @@ LOG = logging.getLogger(__name__)
 
 class Recipe:
     """A class to describe recipe data."""
+
+    ERROR_REQUIRED = '{} is required.'
+    ERROR_EMPTY = '{} is empty.'
+    ERROR_TYPE = '{} should be a {}.'
+    ERROR_INVALID = '{} is invalid.'
+    ERROR_UNKNOWN = '{} is an unknown element.'
+    TYPE_DISP_MAP = {
+        'str': 'string',
+        'list': 'sequences',
+        'dict': 'mappings',
+    }
 
     def __init__(self, file_path, collection_id):
         if not file_path:
@@ -53,41 +66,173 @@ class Recipe:
 
             if isinstance(package, Mapping):
                 # package should be one-item dictionary
-                if len(package) != 1:
-                    message = 'Invalid package data: {}'.format(package)
-                    raise ValueError(message)
-
                 metadata, = package.values()
                 package_dict.update(metadata)
 
             yield package_dict
 
     def verify(self):
-        recipe = self.recipe
-
-        if 'name' not in recipe:
-            raise ValueError('name is required in the recipe.')
-        if not recipe['name']:
-            raise ValueError('name is invalid in the recipe.')
-
-        if 'requires' in recipe:
-            if not isinstance(recipe['requires'], list):
-                raise ValueError('requires should be a list')
-
-        if 'packages' not in recipe:
-            raise ValueError('packages is required in the recipe.')
-        if not recipe['packages']:
-            raise ValueError('packages is invalid in the recipe.')
-        if not isinstance(recipe['packages'], list):
-            raise ValueError('packages should be a list.')
-        for package_dict in self.each_normalized_package():
-            if not package_dict['name']:
-                raise ValueError('name is invalid in the package.')
+        error_messages = self._verify_recipe()
+        if error_messages:
+            raise RecipeError(error_messages)
 
         return True
 
-    @staticmethod
-    def _package_name(package: Union[str, dict]) -> str:
+    def _verify_recipe(self) -> list:
+        error_messages = []
+        recipe = self.recipe
+
+        if 'packages' not in recipe:
+            message = self._format_error_required('packages')
+            error_messages.append(message)
+
+        for key in recipe:
+            is_known_key = False
+            if key == 'name':
+                is_known_key = True
+                if not recipe[key]:
+                    message = self._format_error_empty(key)
+                    error_messages.append(message)
+                if not isinstance(recipe[key], str):
+                    message = self._format_error_type(key, str)
+                    error_messages.append(message)
+            if key == 'requires':
+                is_known_key = True
+                if not recipe[key]:
+                    message = self._format_error_empty(key)
+                    error_messages.append(message)
+                if not isinstance(recipe[key], list):
+                    message = self._format_error_type(key, list)
+                    error_messages.append(message)
+            if key == 'packages':
+                is_known_key = True
+                is_packages_valid = True
+                if not recipe[key]:
+                    is_packages_valid = False
+                    message = self._format_error_empty(key)
+                    error_messages.append(message)
+                if not isinstance(recipe[key], list):
+                    is_packages_valid = False
+                    message = self._format_error_type(key, list)
+                    error_messages.append(message)
+                if is_packages_valid:
+                    # Check the detail of packages element.
+                    error_messages = self._verify_packages_and_append(
+                        error_messages, recipe[key]
+                    )
+            if not is_known_key:
+                message = self._format_error_unknown(key)
+                error_messages.append(message)
+        return error_messages
+
+    def _verify_packages_and_append(self, messages: list,
+                                    packages: list) -> list:
+        if messages is None:
+            raise ValueError('messages is required.')
+        if not packages:
+            raise ValueError('packages is required.')
+        error_messages = messages.copy()
+        disp_packages_format = 'packages[{}] {}'
+
+        for index, package in enumerate(packages):
+            disp_num = index + 1
+
+            if isinstance(package, str):
+                disp_package = disp_packages_format.format(disp_num, package)
+                if not package:
+                    message = self._format_error_empty(disp_package)
+                    error_messages.append(message)
+            elif isinstance(package, dict):
+                name = list(package.keys())[0]
+                disp_package = disp_packages_format.format(disp_num, name)
+
+                if len(package) != 1:
+                    message = self._format_error_invalid(disp_package)
+                    error_messages.append(message)
+                else:
+                    package_metadata = package[name]
+                    error_messages = self._verify_packages_metadata_and_append(
+                        error_messages, package_metadata, disp_package,
+                    )
+            else:
+                disp_package = disp_packages_format.format(disp_num, package)
+
+                message = self._format_error_type(disp_package, (str, dict))
+                error_messages.append(message)
+        return error_messages
+
+    def _verify_packages_metadata_and_append(self, messages: list,
+                                             metadata: dict,
+                                             disp_package: str) -> list:
+        if messages is None:
+            raise ValueError('messages is required.')
+        if not metadata:
+            raise ValueError('metadata is required.')
+        if not disp_package:
+            raise ValueError('disp_package is required.')
+        error_messages = messages.copy()
+
+        for key in metadata.keys():
+            disp_name = '{} {}'.format(disp_package, key)
+            is_known_key = False
+            if key in {'macros', 'replaced_macros'}:
+                is_known_key = True
+                if not metadata[key]:
+                    message = self._format_error_empty(disp_name)
+                    error_messages.append(message)
+                if not isinstance(metadata[key], dict):
+                    message = self._format_error_type(disp_name, dict)
+                    error_messages.append(message)
+            if key == 'cmd':
+                is_known_key = True
+                if not metadata[key]:
+                    message = self._format_error_empty(disp_name)
+                    error_messages.append(message)
+                if not isinstance(metadata[key], (str, list)):
+                    message = self._format_error_type(disp_name, (str, list))
+                    error_messages.append(message)
+            if key == 'dist':
+                is_known_key = True
+                if not metadata[key]:
+                    message = self._format_error_empty(disp_name)
+                    error_messages.append(message)
+                if not isinstance(metadata[key], str):
+                    message = self._format_error_type(disp_name, str)
+                    error_messages.append(message)
+            if not is_known_key:
+                message = self._format_error_unknown(disp_name)
+                error_messages.append(message)
+
+        return error_messages
+
+    def _format_error_required(self, name):
+        return self.ERROR_REQUIRED.format(name)
+
+    def _format_error_empty(self, name):
+        return self.ERROR_EMPTY.format(name)
+
+    def _format_error_type(self, name, types: Union[type, tuple]):
+        disp_type = None
+        if type(types) == type:
+            type_classes = tuple([types])
+        else:
+            type_classes = types
+
+        def make_type_disp(cls):
+            return self.TYPE_DISP_MAP[cls.__name__]
+
+        class_strs = list(map(make_type_disp, type_classes))
+        disp_type = ' or '.join(class_strs)
+
+        return self.ERROR_TYPE.format(name, disp_type)
+
+    def _format_error_invalid(self, name):
+        return self.ERROR_INVALID.format(name)
+
+    def _format_error_unknown(self, name):
+        return self.ERROR_UNKNOWN.format(name)
+
+    def _package_name(self, package: Union[str, dict]) -> str:
         """Extract package name.
 
         Keyword arguments:
@@ -107,7 +252,7 @@ class Recipe:
         elif isinstance(package, dict):
             # package should be one-item dictionary
             if len(package) != 1:
-                message = 'Invalid package data: {}'.format(package)
+                message = self._format_error_invalid(package)
                 raise ValueError(message)
 
             # The name is the only key
@@ -115,7 +260,7 @@ class Recipe:
             return name
 
         else:
-            message = 'Invalid type of package: {!r}'.format(type(package))
+            message = self._format_error_type(package, (str, dict))
             raise ValueError(message)
 
     def _count_bootstrap_sequences(self) -> Mapping[str, Iterator[int]]:
@@ -138,3 +283,14 @@ class Recipe:
         sequence_map = dict(starmap(make_sequence, count_map.items()))
 
         return sequence_map
+
+
+class RecipeError(click.ClickException):
+    """A class to manage validation error for recipe data."""
+
+    def __init__(self, messages: list):
+        super().__init__(messages)
+        self.messages = messages
+
+    def format_message(self):
+        return '\n'.join(['Recipe file is invalid.'] + self.messages)
