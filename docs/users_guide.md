@@ -30,14 +30,16 @@ Main --> Recipe (recipe file)
  |
  +-----> Download +-----> Get pacakges from local directory
  |                |
- |                +-----> Get pacakges from repository by rhpkg clone
+ |                +-----> Get pacakges from repository by fedpkg(or rhpkg) clone
  |                |
  |                +-----> Custom Download -> Define the behavior
  |                                           by the config file.
  |
- +-----> Build ---+-----> Copr Build to Copr
+ +-----> Build ---+-----> Mock Build
                   |
-                  +-----> Mock Build to Mock
+                  +-----> Copr Build
+                  |
+                  +-----> Koji Build
                   |
                   +-----> Custom Build -> Define the behavior
                                           by the config file.
@@ -168,9 +170,20 @@ work_directory/
           RECIPE_FILE \
           COLLECTION_ID
 
-#### Rhpkg
+#### Fedpkg
 
 1. If you have registered your packages to the repository, you may want to build from the packages in repository. In the case, run with `--branch`.
+
+        $ rpmlb \
+          --download fedpkg \
+          --branch BRANCH \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+#### Rhpkg
+
+1. If you want to use `rhpkg` instead of `fedpkg`, run with `--download rhpkg`. Other options are same with `--download fedpkg`.
 
         $ rpmlb \
           --download rhpkg \
@@ -212,7 +225,7 @@ For both hooks, the environment variable `CUSTOM_DIR` refers to the directory co
 
 ### Select build type
 
-#### Mock Build
+#### Mock build
 
 1. If you wan to build with mock, run with `--mock-config` (it is same with `mock -r`).
 
@@ -274,7 +287,6 @@ For both hooks, the environment variable `CUSTOM_DIR` refers to the directory co
           RECIPE_FILE \
           COLLECTION_ID
 
-
 ### Resume from any position of pacakges
 
 1. If your build was failed during the process due to some reasons, you want to resume your build. In case run with `--work-directory` and  `--resume`. The resume number is same with the number directory name in work directory. zero padding is ignored. That is ex. 01 => 1, 012 => 12.
@@ -287,3 +299,66 @@ For both hooks, the environment variable `CUSTOM_DIR` refers to the directory co
           ...
           RECIPE_FILE \
           COLLECTION_ID
+
+### Specify retry count for build
+
+1. You can set retry count for build. For example, below sample shows that the build is run 3 times after the 1st build failed. (= totally try to build 4 times.). When this retry option is not specified, retry count is zero. (retry is disabled.)
+
+        $ rpmlb \
+          ...
+          --retry 3 \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+### Specify a package command explicitly
+
+1. The package command `fedpkg` or `rhpkg` are used in build type: Mock, Copr. If you want to specify the command from command option, you can use `--cmd-pkg` option.
+
+2. If `--download fedpkg or rhpkg` is specified, the package command is also used in the build.
+3. If the download type is not `fedpkg`, and not `rhpkg`, `fedpkg` is used as a default.
+
+        $ rpmlb \
+          ...
+          --download fedpkg \
+          --build copr \
+          --copr-repo COPR_REPO \
+          --pkg-cmd rhpkg \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+### Specify a distribution mode
+
+1.  You may want to build specified packages, edit RPM spec file or run `patch` command for specified distribution platform. In that case, you can set conditional `dist` element or environment variable `DIST` in the recipe file.
+
+        $ rpmlb \
+          ...
+          --dist centos \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+2. We are supporting the values such as `fc`, `fc26`, `centos`, `centos7`, `el`, `el7` as a value of `--dist`.
+
+### Recipe file, custom file and environment variables
+
+1. You can use enviornment variables in a recipe file (`cmd` element) or custom file.
+
+        $ FOO=foo BAR=bar rpmlb \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+2. Recipe file
+
+        joke:
+          name: Joke
+          packages:
+            - sl:
+                cmd: echo "${FOO}"
+
+3. Custom file
+
+        build:
+          - echo "${BAR}"
