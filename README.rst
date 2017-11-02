@@ -1,10 +1,13 @@
 RPM List Builder
 ================
 
-|Travis Build Status|
+.. image:: https://img.shields.io/pypi/v/rpmlb.svg
+     :alt: PyPI
+     :target: https://pypi.python.org/pypi/rpmlb
 
-.. |Travis Build Status| image:: https://travis-ci.org/sclorg/rpm-list-builder.svg?branch=master
-   :target: https://travis-ci.org/sclorg/rpm-list-builder
+.. image:: https://travis-ci.org/sclorg/rpm-list-builder.svg?branch=master
+     :alt: Travis Build Status
+     :target: https://travis-ci.org/sclorg/rpm-list-builder
 
 RPM List Builder (``rpmlb``) helps you to build a list of defined RPM
 packages including Red Hat Software Collection (SCL) continually from
