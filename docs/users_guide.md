@@ -256,6 +256,43 @@ For both hooks, the environment variable `CUSTOM_DIR` refers to the directory co
           RECIPE_FILE \
           COLLECTION_ID
 
+#### Koji build
+
+[Koji]: https://koji.fedoraproject.org/koji/
+[CBS]: https://cbs.centos.org/koji/
+
+1.  Ensure that you have configuration for the desired koji instance
+    (i.e. [Fedora Koji][Koji], [CentOS CBS][CBS], …) installed on your system.
+
+    *   If you are unsure, check that the file
+        `/etc/koji.conf.d/<profile>.conf` exists.
+
+2.  To build for any Koji instance, enter
+
+        $ rpmlb
+          ...
+          --build koji \
+          --koji-epel EPEL_VERSION \
+          --koji-profile PROFILE \
+          --koji-owner OWNER \
+          ...
+          RECIPE_FILE \
+          COLLECTION_ID
+
+    Here, `EPEL_VERSION` is the major EL version you wish to build for
+    (i.e. `7` for CentOS 7), `PROFILE` names the configuration profile
+    to use (it acts the same as `koji --profile` option) and `OWNER` is the
+    name of the user that should own any new packages in the build target.
+
+    You can also specify `--koji-scratch` flag to test your build(s).
+
+    If the build target name does not follow the convention of [CBS][],
+    where each target is named as `sclo{el}-{collection}-rh-el{el}`,
+    you can override this template with the option `--koji-target-format`.
+    Any `{el}`, `{collection}` placeholders will be replaced with
+    the EL version and SCL name, respectively,
+    when choosing a target to build into.
+
 #### Custom build
 
 1. You may want to customize your build way. In case, you can run with `--custom-file`.
