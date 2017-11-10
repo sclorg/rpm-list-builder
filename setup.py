@@ -8,7 +8,7 @@ setuptools.setup(
     name='rpmlb',
     license='GPLv2+',
     use_scm_version=True,
-    description='Software Collection Rebuild Helper',
+    description='RPM List Builder',
     long_description=readme,
     author='Jun Aruga',
     author_email='jaruga@redhat.com',
