@@ -28,4 +28,4 @@ USER "${TEST_USER_ID}"
 
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-CMD ["/usr/bin/tox"]
+CMD ["tox"]
