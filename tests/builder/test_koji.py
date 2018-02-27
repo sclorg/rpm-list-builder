@@ -183,7 +183,7 @@ def test_make_srpm_creates_srpm(spec_path, collection_id, epel):
     configure_logging(DEBUG)
 
     arguments = {
-        'name': spec_path.stem,
+        'base_name': spec_path.stem,
         'collection': collection_id,
         'epel': epel,
     }
@@ -192,7 +192,9 @@ def test_make_srpm_creates_srpm(spec_path, collection_id, epel):
         # Metapackage
         '{collection}-1-1.el{epel}.src.rpm'.format_map(arguments),
         # Regular package
-        '{collection}-{name}-1.0-1.el{epel}.src.rpm'.format_map(arguments),
+        '{collection}-{base_name}-1.0-1.el{epel}.src.rpm'.format_map(
+            arguments,
+        ),
     }
 
     srpm_path = KojiBuilder._make_srpm(**arguments)
@@ -207,7 +209,7 @@ def test_missing_spec_is_reported(tmpdir):
     configure_logging(DEBUG)
 
     with tmpdir.as_cwd(), pytest.raises(FileNotFoundError):
-        KojiBuilder._make_srpm(name='test', collection='test', epel=7)
+        KojiBuilder._make_srpm(base_name='test', collection='test', epel=7)
 
 
 def test_prepare_adjusts_bootstrap_release(builder, spec_contents):
@@ -298,3 +300,14 @@ def test_add_package_respects_owner(monkeypatch, builder):
     cmd, = commands
     assert '--owner' in cmd
     assert builder.owner in cmd
+
+
+@pytest.mark.parametrize('package_name,expected', [
+    ('rh-ror50', 'rh-ror50'),
+    ('ruby', 'rh-ror50-ruby'),
+])
+def test_full_name_is_resolved_correctly(builder, package_name, expected):
+    """Assert that build adds the package with correct name."""
+
+    full_name = builder._full_package_name(package_name, builder.collection)
+    assert full_name == expected
