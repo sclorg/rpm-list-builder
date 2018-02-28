@@ -131,51 +131,41 @@ class KojiBuilder(BaseBuilder):
         """Build a package using Koji instance"""
 
         base_name = package_dict['name']
-        full_name = self._full_package_name(base_name, self.collection)
-        srpm_path = self._make_srpm(
-            name=base_name,
-            collection=self.collection,
-            epel=self.epel,
-        )
+        full_name = self._full_package_name(base_name)
+        srpm_path = self._make_srpm(name=base_name)
 
         self._add_package(full_name)
         self._submit_build(srpm_path)
         self._wait_for_repo()
 
-    @staticmethod
-    def _full_package_name(base_name: str, collection: str) -> str:
+    def _full_package_name(self, base_name: str) -> str:
         """Determine what the full name of the package should be
         after applying the collection prefix.
 
         Keyword arguments:
             base_name: Name of the package, without the collection part.
-            collection: Name/identification of the package's collection.
 
         Returns:
             Canonical full name.
         """
 
         # The metapackage
-        if base_name == collection:
+        if base_name == self.collection:
             return base_name
         else:
-            return '-'.join((collection, base_name))
+            return '-'.join((self.collection, base_name))
 
-    @staticmethod
-    def _make_srpm(base_name: str, collection: str, epel: int) -> Path:
+    def _make_srpm(self, name: str) -> Path:
         """Create SRPM of the specified name in current directory.
 
         Keyword arguments:
-            base_name: Name of the package to create,
-                without collection prefix.
-            collection: Name/identification of the package's collection.
-            epel: The EPEL version to build for.
+            name: Name of the package to create, without collection prefix.
 
         Returns:
             Path to the created SRPM.
         """
 
-        spec_path = Path('.'.join((base_name, 'spec')))
+        spec_path = Path('.'.join((name, 'spec')))
         if not spec_path.exists():
             raise FileNotFoundError(spec_path)
 
@@ -188,9 +178,11 @@ class KojiBuilder(BaseBuilder):
             '_{kind}dir {cwd}'.format(kind=k, cwd=cwd) for k in directory_kinds
         ]
         # dist tag
-        define_list.append('dist .el{epel}'.format(epel=epel))
+        define_list.append('dist .el{epel}'.format(epel=self.epel))
         # collection name – needed to generate prefixed package
-        define_list.append('scl {collection}'.format(collection=collection))
+        define_list.append('scl {collection}'.format(
+            collection=self.collection,
+        ))
 
         # Assemble the command
         command = ['rpmbuild']
@@ -199,9 +191,8 @@ class KojiBuilder(BaseBuilder):
 
         run_cmd_with_capture(' '.join(command))
 
-        srpm_glob = '{full_name}-*.src.rpm'.format(
-            full_name=KojiBuilder._full_package_name(base_name, collection),
-        )
+        # SRPM contains the collection prefix
+        srpm_glob = '{}-*.src.rpm'.format(self._full_package_name(name))
         srpm_path, = cwd.glob(srpm_glob)
         return srpm_path
 
