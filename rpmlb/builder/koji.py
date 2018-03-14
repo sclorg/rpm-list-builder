@@ -130,27 +130,36 @@ class KojiBuilder(BaseBuilder):
     def build(self, package_dict, **kwargs):
         """Build a package using Koji instance"""
 
-        srpm_path = self._make_srpm(
-            name=package_dict['name'],
-            collection=self.collection,
-            epel=self.epel,
-        )
+        base_name = package_dict['name']
+        full_name = self._full_package_name(base_name)
+        srpm_path = self._make_srpm(name=base_name)
 
-        self._add_package(name='{collection}-{name}'.format(
-            collection=self.collection,
-            name=package_dict['name'],
-        ))
+        self._add_package(full_name)
         self._submit_build(srpm_path)
         self._wait_for_repo()
 
-    @staticmethod
-    def _make_srpm(name: str, collection: str, epel: int) -> Path:
+    def _full_package_name(self, base_name: str) -> str:
+        """Determine what the full name of the package should be
+        after applying the collection prefix.
+
+        Keyword arguments:
+            base_name: Name of the package, without the collection part.
+
+        Returns:
+            Canonical full name.
+        """
+
+        # The metapackage
+        if base_name == self.collection:
+            return base_name
+        else:
+            return '-'.join((self.collection, base_name))
+
+    def _make_srpm(self, name: str) -> Path:
         """Create SRPM of the specified name in current directory.
 
         Keyword arguments:
-            name: Name of the package to create.
-            collection: Name/identification of the package's collection.
-            epel: The EPEL version to build for.
+            name: Name of the package to create, without collection prefix.
 
         Returns:
             Path to the created SRPM.
@@ -169,9 +178,11 @@ class KojiBuilder(BaseBuilder):
             '_{kind}dir {cwd}'.format(kind=k, cwd=cwd) for k in directory_kinds
         ]
         # dist tag
-        define_list.append('dist .el{epel}'.format(epel=epel))
+        define_list.append('dist .el{epel}'.format(epel=self.epel))
         # collection name – needed to generate prefixed package
-        define_list.append('scl {collection}'.format(collection=collection))
+        define_list.append('scl {collection}'.format(
+            collection=self.collection,
+        ))
 
         # Assemble the command
         command = ['rpmbuild']
@@ -180,15 +191,9 @@ class KojiBuilder(BaseBuilder):
 
         run_cmd_with_capture(' '.join(command))
 
-        if name == collection:  # metapackage build
-            glob_format = '{collection}-*.src.rpm'
-        else:
-            glob_format = '{collection}-{name}-*.src.rpm'
-
-        srpm_path, = cwd.glob(glob_format.format(
-            collection=collection,
-            name=name,
-        ))
+        # SRPM contains the collection prefix
+        srpm_glob = '{}-*.src.rpm'.format(self._full_package_name(name))
+        srpm_path, = cwd.glob(srpm_glob)
         return srpm_path
 
     @property
