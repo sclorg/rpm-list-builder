@@ -12,7 +12,7 @@ matrix:
       - CONTAINER_IMAGE=jsmigel/centos-epel DNF=yum
     - python: '3.6'
       env:
-      - TOXENV=style EXTRA_PKGS="ShellCheck which"
+      - TOXENV=style EXTRA_PKGS="which"
 
 sudo: required
 dist: trusty

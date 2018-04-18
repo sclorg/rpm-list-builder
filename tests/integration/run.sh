@@ -1,5 +1,4 @@
 #!/bin/bash
-# shellcheck disable=SC2039
 
 pushd "$(dirname "${0}")/../.." > /dev/null
 ROOT_DIR=$(pwd)
@@ -259,7 +258,6 @@ EOF
                 ) >> "${LOG_FILE}" 2>&1
             )
         )
-        # shellcheck disable=SC2181
         if [ "${?}" != "0" ]; then
             is_ok="0"
             ret_status="1"
