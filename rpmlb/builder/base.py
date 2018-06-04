@@ -195,8 +195,6 @@ class BaseBuilder:
         # Provide the handles
         with source_path.open(mode='r') as source_file, \
                 target_path.open(mode='w') as target_file:
-            print('# Edited by rpmlb', file=target_file)
-
             yield source_file, target_file
 
             # Ensure that all unprocessed source contents

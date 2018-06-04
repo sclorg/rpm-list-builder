@@ -165,16 +165,9 @@ def test_double_edit(empty_spec_path):
             print(indicator, file=dst)
             dst.write(src.read())
 
-    def count_markers(path, marker='# Edited by rpmlb'):
-        """Count lines containing marker text in file"""
-
-        with path.open() as handle:
-            return sum(marker in line for line in handle)
-
     for indicator in ('First edit', 'Second edit'):
         edit_file(empty_spec_path, indicator)
         assert empty_spec_path.exists()
-        assert count_markers(empty_spec_path) == 1
 
 
 def test_macros_are_added_correctly(macro_spec_path, prepared_macros):
