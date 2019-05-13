@@ -22,8 +22,13 @@ class BaseRpkgDownloader(BaseDownloader):
 
         package = package_dict['name']
         cmd = r'''
-{} co {} && \
-cd {} && \
-git checkout {}
-        '''.strip().format(self.command, package, package, branch)
+{command} co {package} && \
+cd {package} && \
+git checkout {branch} && \
+{command} sources
+        '''.strip().format(
+            command=self.command,
+            package=package,
+            branch=branch,
+        )
         utils.run_cmd(cmd)

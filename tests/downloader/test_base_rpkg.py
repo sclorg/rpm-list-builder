@@ -36,7 +36,8 @@ def test_download_passes_on_valid_arguments(mock_downloader):
         cmd = r'''
 testpkg co a && \
 cd a && \
-git checkout private-foo
+git checkout private-foo && \
+testpkg sources
         '''.strip()
         mock_run_cmd.assert_called_once_with(cmd)
     assert True
